@@ -1,0 +1,28 @@
+metrics:
+  - openfda_metrics.yaml
+inputs:
+  drugs_input:
+    file:
+      path: input/19.06_drug-data.json
+      format: JSON
+  fdas_raw_input:
+    file:
+      path: "input/fdas_raw/*.json"
+      format: JSON
+      options:
+        multiLine: "true"
+        mode: "DROPMALFORMED"
+  blacklist_input:
+    file:
+      path: input/blacklist.csv
+      format: CSV
+      options:
+        sep: "\t"
+        ignoreLeadingWhiteSpace: "true"
+        ignoreTrailingWhiteSpace: "true"
+        header: "false"
+output:
+  file:
+    dir: "out"
+logLevel: WARN
+appName: platformOFDAs

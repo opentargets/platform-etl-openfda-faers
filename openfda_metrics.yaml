@@ -1,0 +1,304 @@
+steps:
+  - dataFrameName: fdas_raw
+    # this query gets each openfda json file, parse it as multiline and
+    # select the results array, explode it and expand the inner col structure
+    # as a root of the dataframe
+    sql:
+      SELECT
+        col.*
+      FROM (
+        SELECT
+          explode(results)
+        FROM fdas_raw_input)
+  - dataFrameName: blacklist_reactions
+    # blacklist reactions is a one column (no headers) list of manual curated adverse events
+    # to ban from the FAERS database
+    # it is loaded and cached so this dataframe is not really a dataframe to save as doesn't
+    # return anything
+    sql:
+      CACHE TABLE cached_blacklist_reactions AS
+        (SELECT
+          _c0 as reactions
+        FROM blacklist_input)
+  - dataFrameName: drugs
+    # drugs is a ETL process in order to get per chembl_id a list of drug names and target ids
+    # this df is the base for further extractions
+    sql:
+      SELECT
+        id as chembl_id,
+        transform(
+          array_distinct(
+            array_union(
+              trade_names,
+              array_union(array(pref_name), synonyms)
+            )
+          ),
+          ar -> lower(ar)) as drug_names,
+        array_distinct(flatten(transform(mechanisms_of_action, m ->
+          array_distinct(transform(m.target_components, t -> t.ensembl))))) as target_ids
+      FROM drugs_input
+  - dataFrameName: drugs_expl_by_name
+    # we use the df drugs to generate a list of (chembl_id, drug_name) where
+    # the pair chembl_id - drug_name is unique. Although chembl_id can be repeated
+    sql:
+      SELECT DISTINCT
+        D.chembl_id as chembl_id,
+        D.drug_name as drug_name
+      FROM (
+        SELECT
+          chembl_id,
+          explode(drug_names) as drug_name
+        FROM drugs) D
+      ORDER BY drug_name
+  - dataFrameName: drugs_expl_by_gene
+    # we use the df drugs to generate a list of (target_id, drug_name) where
+    # the pair target_id - drug_name is unique. Although target_id can be repeated
+    sql:
+      SELECT DISTINCT
+        drug_name,
+        target_id
+      FROM (
+        SELECT
+          chembl_id,
+          explode(target_ids) as target_id
+        FROM drugs)
+      INNER JOIN drugs_expl_by_name USING (chembl_id)
+      ORDER BY drug_name
+  - dataFrameName: fdas_pre1
+    # first ETL pass for fda lines. It basically selects the right fields and generate
+    # per line a list of reaction - drug pairs (reaction_drug_pairs) for further processing
+    # this list of pairs is the cartesian product per report-patient
+    sql:
+      SELECT *,
+        flatten(transform(patient_reaction,
+          reaction -> transform(patient_drug, drug -> (reaction,drug))
+        )) as reaction_drug_pairs
+      FROM (SELECT safetyreportid,
+              serious,
+              seriousnessdeath,
+              receivedate,
+              primarysource.qualification as qualification,
+              patient.reaction as patient_reaction,
+              patient.drug as patient_drug
+            FROM fdas_raw)
+  - dataFrameName: fdas_pre2
+    # the second ETL pass for fda before it becomes usable. It explode (reaction_drug_pairs)
+    # and unzip it into reaction, drug column again but exploded from a report-patient as
+    # it may contain multiple drug reaction so a cartesian product has to be built before
+    # explode it
+    sql:
+      SELECT safetyreportid,
+        serious,
+        receivedate,
+        seriousnessdeath,
+        qualification,
+        exploded_reaction_drug_pairs.reaction as reaction,
+        exploded_reaction_drug_pairs.drug as drug
+      FROM fdas_pre1 LATERAL VIEW explode(reaction_drug_pairs) as exploded_reaction_drug_pairs
+  - dataFrameName: fdas_drug_names
+    # basically we need a unified list of drug names to compare with as names are spread across
+    # multiple fields so those are combined into a unique set of drug names called drug_list
+    # this field will be used for exploding purposes
+    sql:
+      SELECT
+        *,
+        array_distinct(transform(
+            array_union(drug_brand_name_list,
+            array_union(array(drug_medicinalproduct),
+            array_union(drug_generic_name_list, drug_substance_name_list))),
+          d -> lower(d))
+        ) as drug_list
+      FROM (SELECT
+              drug.drugcharacterization as drug_characterization,
+              ifnull(seriousnessdeath, '0') as seriousness_death,
+              lower(reaction.reactionmeddrapt) as reaction_reactionmeddrapt,
+              ifnull(lower(drug.medicinalproduct), '') as drug_medicinalproduct,
+              ifnull(drug.openfda.generic_name, array()) as drug_generic_name_list,
+              ifnull(drug.openfda.brand_name, array()) as drug_brand_name_list,
+              ifnull(drug.openfda.substance_name, array()) as drug_substance_name_list,
+              safetyreportid,
+              serious,
+              receivedate,
+              qualification
+        FROM fdas_pre2)
+      WHERE
+        (qualification in ('1','2','3')) and
+        (drug_characterization = '1') and
+        isnotnull(reaction_reactionmeddrapt) and
+        isnotnull(safetyreportid) and
+        (seriousness_death = '0')
+  - dataFrameName: fdas_without_bl
+    # another ETL step before having the cleaned and lean fdas dataframe
+    # we remove blacklisted reactions
+#     /*+ BROADCAST(blacklist_reactions) */
+    sql:
+      SELECT
+        *
+      FROM fdas_drug_names
+      LEFT ANTI JOIN cached_blacklist_reactions BL
+        ON (BL.reactions = fdas_drug_names.reaction_reactionmeddrapt)
+  - dataFrameName: fdas_without_bl_by_drug_name
+    # explode the drug_list field into a list of rows, one per drug name
+    sql:
+      SELECT
+        *,
+        drug_name
+      FROM fdas_without_bl LATERAL VIEW explode(drug_list) as drug_name
+  - dataFrameName: fdas_without_bl_by_drug_name_inner_drugs
+    # having the dataset of fdas exploded with one drug_name per row we
+    # inner join with the curated list of drug names we have in OT drug index
+    # this case using drug_name as a way to match the drug by chembl_id
+    sql:
+      SELECT
+        *
+      FROM fdas_without_bl_by_drug_name
+      INNER JOIN drugs_expl_by_name USING (drug_name)
+  - dataFrameName: uniq_reports
+    # just a cached computation of unique counts of reports (total)
+    sql:
+      CACHE TABLE cached_uniq_reports AS
+        (SELECT
+          count(DISTINCT safetyreportid) as uniq_reports
+        FROM fdas_without_bl_by_drug_name_inner_drugs)
+  - dataFrameName: uniq_reports_by_reactions
+    # unique reports grouped by reaction returning a dataset of
+    # reaction1 unique_counts and so on  across all dataset
+    sql:
+      CACHE TABLE cached_uniq_reports_by_reactions AS
+        (SELECT
+          reaction_reactionmeddrapt,
+          count(DISTINCT safetyreportid) as uniq_report_ids_by_reaction
+        FROM fdas_without_bl_by_drug_name_inner_drugs
+        GROUP BY reaction_reactionmeddrapt)
+  - dataFrameName: uniq_reports_by_drugs
+    # unique reports grouped by drug (using chembl_id this time) returning a dataset of
+    # chembl_id1 unique_counts and so on  across all dataset
+    sql:
+      CACHE TABLE cached_uniq_reports_by_drugs AS
+        (SELECT
+          chembl_id,
+          count(DISTINCT safetyreportid) as uniq_report_ids_by_drug
+        FROM fdas_without_bl_by_drug_name_inner_drugs
+        GROUP BY chembl_id)
+  - dataFrameName: fdas_final
+    # the fdas dataset is mostly processed before the required computations
+    # just putting all required numbers together
+    sql:
+      SELECT
+        F.*,
+        R.uniq_report_ids_by_reaction,
+        D.uniq_report_ids_by_drug,
+        E.*
+      FROM
+        fdas_without_bl_by_drug_name_inner_drugs F
+        INNER JOIN cached_uniq_reports_by_reactions R USING (reaction_reactionmeddrapt)
+        INNER JOIN cached_uniq_reports_by_drugs D USING (chembl_id),
+        cached_uniq_reports E
+  - dataFrameName: fdas_final_drug_reaction
+    # final dataset with the ln(Likelihood-ratio test) represented by llr
+    # this is computed per (chembl_id - reaction) pair.
+    sql:
+      SELECT
+        chembl_id,
+        reaction_reactionmeddrapt,
+        A,
+        B,
+        C,
+        D,
+        (A * (ln(A) - ln(A + B))) as aterm,
+        (C * (ln(C) - ln(C + D))) as cterm,
+        ((A + C) * (ln(A + C) - ln(A + B + C + D))) as acterm,
+        ((A * (ln(A) - ln(A + B))) + (C * (ln(C) - ln(C + D))) - ((A + C) * (ln(A + C) - ln(A + B + C + D)))) as llr
+      FROM (
+        SELECT
+          chembl_id,
+          reaction_reactionmeddrapt,
+          count(DISTINCT safetyreportid) as A,
+          first(uniq_report_ids_by_reaction) as B,
+          first(uniq_report_ids_by_drug) as C,
+          first(uniq_reports) as D
+        FROM fdas_final
+        GROUP BY
+          chembl_id,
+          reaction_reactionmeddrapt)
+  - dataFrameName: fdas_without_bl_by_drug_name_inner_targets
+    # we repeat the previous process but using target_id this time as a
+    # way of llr given a pair (target_id, reaction)
+    # you can read the comments above in order to understand the code below
+    # but basically is the same but using target_id instead chembl_id
+    sql:
+      SELECT
+        *
+      FROM fdas_without_bl_by_drug_name
+      INNER JOIN drugs_expl_by_gene USING (drug_name)
+      WHERE isnotnull(target_id)
+  - dataFrameName: uniq_reports_targets
+    sql:
+      CACHE TABLE cached_uniq_reports_targets AS
+        (SELECT
+          count(DISTINCT safetyreportid) as uniq_reports
+        FROM fdas_without_bl_by_drug_name_inner_targets)
+  - dataFrameName: uniq_reports_by_reactions_targets
+    sql:
+      CACHE TABLE cached_uniq_reports_by_reactions_targets AS
+        (SELECT
+          reaction_reactionmeddrapt,
+          count(DISTINCT safetyreportid) as uniq_report_ids_by_reaction
+        FROM fdas_without_bl_by_drug_name_inner_targets
+        GROUP BY reaction_reactionmeddrapt)
+  - dataFrameName: uniq_reports_by_targets
+    sql:
+      CACHE TABLE cached_uniq_reports_by_targets AS
+        (SELECT
+          target_id,
+          count(DISTINCT safetyreportid) as uniq_report_ids_by_target
+        FROM fdas_without_bl_by_drug_name_inner_targets
+        GROUP BY target_id)
+  - dataFrameName: fdas_final_targets
+    sql:
+      SELECT
+        F.*,
+        R.uniq_report_ids_by_reaction,
+        D.uniq_report_ids_by_target,
+        E.*
+      FROM
+        fdas_without_bl_by_drug_name_inner_targets F
+        INNER JOIN cached_uniq_reports_by_reactions R USING (reaction_reactionmeddrapt)
+        INNER JOIN cached_uniq_reports_by_targets D USING (target_id),
+        cached_uniq_reports_targets E
+  - dataFrameName: fdas_final_target_reaction
+    sql:
+      SELECT
+        target_id,
+        reaction_reactionmeddrapt,
+        A,
+        B,
+        C,
+        D,
+        (A * (ln(A) - ln(A + B))) as aterm,
+        (C * (ln(C) - ln(C + D))) as cterm,
+        ((A + C) * (ln(A + C) - ln(A + B + C + D))) as acterm,
+        ((A * (ln(A) - ln(A + B))) + (C * (ln(C) - ln(C + D))) - ((A + C) * (ln(A + C) - ln(A + B + C + D)))) as llr
+      FROM (
+        SELECT
+          target_id,
+          reaction_reactionmeddrapt,
+          count(DISTINCT safetyreportid) as A,
+          first(uniq_report_ids_by_reaction) as B,
+          first(uniq_report_ids_by_target) as C,
+          first(uniq_reports) as D
+        FROM fdas_final_targets
+        GROUP BY
+          target_id,
+          reaction_reactionmeddrapt)
+output:
+  - dataFrameName: fdas_final_target_reaction
+    outputType: JSON
+    outputOptions:
+      saveMode: Overwrite
+      path: "fdas_target_reaction.json"
+  - dataFrameName: fdas_final_drug_reaction
+    outputType: JSON
+    outputOptions:
+      saveMode: Overwrite
+      path: "fdas_drug_reaction.json"
