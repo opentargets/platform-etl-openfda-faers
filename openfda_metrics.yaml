@@ -153,33 +153,30 @@ steps:
         *
       FROM fdas_without_bl_by_drug_name
       INNER JOIN drugs_expl_by_name USING (drug_name)
-  - dataFrameName: uniq_reports
+  - dataFrameName: cached_uniq_reports
     # just a cached computation of unique counts of reports (total)
     sql:
-      CACHE TABLE cached_uniq_reports AS
-        (SELECT
+      SELECT
           count(DISTINCT safetyreportid) as uniq_reports
-        FROM fdas_without_bl_by_drug_name_inner_drugs)
-  - dataFrameName: uniq_reports_by_reactions
+        FROM fdas_without_bl_by_drug_name_inner_drugs
+  - dataFrameName: cached_uniq_reports_by_reactions
     # unique reports grouped by reaction returning a dataset of
     # reaction1 unique_counts and so on  across all dataset
     sql:
-      CACHE TABLE cached_uniq_reports_by_reactions AS
-        (SELECT
+      SELECT
           reaction_reactionmeddrapt,
           count(DISTINCT safetyreportid) as uniq_report_ids_by_reaction
         FROM fdas_without_bl_by_drug_name_inner_drugs
-        GROUP BY reaction_reactionmeddrapt)
-  - dataFrameName: uniq_reports_by_drugs
+        GROUP BY reaction_reactionmeddrapt
+  - dataFrameName: cached_uniq_reports_by_drugs
     # unique reports grouped by drug (using chembl_id this time) returning a dataset of
     # chembl_id1 unique_counts and so on  across all dataset
     sql:
-      CACHE TABLE cached_uniq_reports_by_drugs AS
-        (SELECT
-          chembl_id,
-          count(DISTINCT safetyreportid) as uniq_report_ids_by_drug
-        FROM fdas_without_bl_by_drug_name_inner_drugs
-        GROUP BY chembl_id)
+      SELECT
+        chembl_id,
+        count(DISTINCT safetyreportid) as uniq_report_ids_by_drug
+      FROM fdas_without_bl_by_drug_name_inner_drugs
+      GROUP BY chembl_id
   - dataFrameName: fdas_final
     # the fdas dataset is mostly processed before the required computations
     # just putting all required numbers together
@@ -232,28 +229,25 @@ steps:
       FROM fdas_without_bl_by_drug_name
       INNER JOIN drugs_expl_by_gene USING (drug_name)
       WHERE isnotnull(target_id)
-  - dataFrameName: uniq_reports_targets
+  - dataFrameName: cached_uniq_reports_targets
     sql:
-      CACHE TABLE cached_uniq_reports_targets AS
-        (SELECT
+      SELECT
           count(DISTINCT safetyreportid) as uniq_reports
-        FROM fdas_without_bl_by_drug_name_inner_targets)
-  - dataFrameName: uniq_reports_by_reactions_targets
+        FROM fdas_without_bl_by_drug_name_inner_targets
+  - dataFrameName: cached_uniq_reports_by_reactions_targets
     sql:
-      CACHE TABLE cached_uniq_reports_by_reactions_targets AS
-        (SELECT
+      SELECT
           reaction_reactionmeddrapt,
           count(DISTINCT safetyreportid) as uniq_report_ids_by_reaction
         FROM fdas_without_bl_by_drug_name_inner_targets
-        GROUP BY reaction_reactionmeddrapt)
-  - dataFrameName: uniq_reports_by_targets
+        GROUP BY reaction_reactionmeddrapt
+  - dataFrameName: cached_uniq_reports_by_targets
     sql:
-      CACHE TABLE cached_uniq_reports_by_targets AS
-        (SELECT
+      SELECT
           target_id,
           count(DISTINCT safetyreportid) as uniq_report_ids_by_target
         FROM fdas_without_bl_by_drug_name_inner_targets
-        GROUP BY target_id)
+        GROUP BY target_id
   - dataFrameName: fdas_final_targets
     sql:
       SELECT
@@ -263,7 +257,7 @@ steps:
         E.*
       FROM
         fdas_without_bl_by_drug_name_inner_targets F
-        INNER JOIN cached_uniq_reports_by_reactions R USING (reaction_reactionmeddrapt)
+        INNER JOIN cached_uniq_reports_by_reactions_targets R USING (reaction_reactionmeddrapt)
         INNER JOIN cached_uniq_reports_by_targets D USING (target_id),
         cached_uniq_reports_targets E
   - dataFrameName: fdas_final_target_reaction
