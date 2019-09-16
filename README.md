@@ -21,7 +21,7 @@ export JAVA_OPTS="-Xms512m -Xmx<mostofthememingigslike100G>"
 java -Dspark.master=local[*] -Dspark.sql.crossJoin.enabled=true -Dspark.driver.maxResultSize=0 -cp metorikku-standalone.jar com.yotpo.metorikku.Metorikku -c openfda.yaml
 ```
 
-### Generate the drug dump from ES5
+### Generate the drug dump from ES7
 
 You will need to either connect to a machine containing the ES or forward the ssh port from it
 ```sh
@@ -42,9 +42,19 @@ curl -XGET 'https://api.fda.gov/download.json' | \
     cat - | \
     jq -r '.results.drug.event.partitions[].file' > files.txt
 
-for f in $(cat files.txt); do 
-    wget -c "$f" -O - | gunzip > $(uuidgen -r)"_file.json"
+# get number of cores of the computer as cardinality of the files set is around 900
+cores=$(cat /proc/cpuinfo | grep processor | wc -l)
+
+# split file into cores chunks
+split -d -n l/$cores files.txt f_
+
+for fname in $(ls -1 f_*); do
+    (for f in $(cat $fname); do wget -c "$f" -O - | gunzip > $(uuidgen -r)"_file.json"; done) &
 done
+
+# wait for all processes to finish
+wait
+exit 0
 ```
 
 ### Montecarlo implementation for the critical value
