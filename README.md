@@ -18,7 +18,7 @@ In order to run the script you might want to update the input path entries from 
 ```sh
 export JAVA_OPTS="-Xms512m -Xmx<mostofthememingigslike100G>"
 # to compute the dataset
-java -Dspark.master=local[*] -Dspark.sql.crossJoin.enabled=true -Dspark.driver.maxResultSize=0 -cp metorikku-standalone.jar com.yotpo.metorikku.Metorikku -c openfda.yaml
+java -Dspark.master=local[*] -Dspark.sql.broadcastTimeout=60000 -Dspark.executor.heartbeatInterval=60000 -Dspark.sql.crossJoin.enabled=true -Dspark.driver.maxResultSize=0 -cp metorikku-standalone.jar com.yotpo.metorikku.Metorikku -c openfda.yaml
 ```
 
 ### Generate the drug dump from ES7
