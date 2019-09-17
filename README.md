@@ -6,19 +6,23 @@ The openFDA drug adverse event API returns data that has been collected from the
 
 ### Requirements
 
-1. Java 1.8
-2. https://github.com/YotpoLtd/metorikku
-3. drug index dump from our internal ES image
-4. OpenFDA FAERS drug files downloaded
+### Requirements
+
+1. OpenJDK 1.8
+2. scala 2.12.x (through SDKMAN is simple)
+3. ammonite REPL
+4. Drug index dump from OpenTargets ES
+5. OpenFDA FAERS DB
 
 ### Run the scala script
-
-In order to run the script you might want to update the input path entries from openfda.yaml file.
 
 ```sh
 export JAVA_OPTS="-Xms512m -Xmx<mostofthememingigslike100G>"
 # to compute the dataset
-java -Dspark.master=local[*] -Dspark.sql.broadcastTimeout=60000 -Dspark.executor.heartbeatInterval=60000 -Dspark.sql.crossJoin.enabled=true -Dspark.driver.maxResultSize=0 -cp metorikku-standalone.jar com.yotpo.metorikku.Metorikku -c openfda.yaml
+time amm platformDataProcessFDA.sc \
+    --drugSetPath "/data/jsonl/19.06_drug-data.json" \
+    --inputPathPrefix "/data/eirini/raw/**/*.jsonl" \
+    --outputPathPrefix /data/eirini/out
 ```
 
 ### Generate the drug dump from ES7
