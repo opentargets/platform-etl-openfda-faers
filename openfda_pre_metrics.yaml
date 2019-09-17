@@ -1,0 +1,106 @@
+steps:
+  - dataFrameName: fdas_raw
+    # this query gets each openfda json file, parse it as multiline and
+    # select the results array, explode it and expand the inner col structure
+    # as a root of the dataframe
+    sql:
+      SELECT
+        col.*
+      FROM (
+        SELECT
+          explode(results)
+        FROM fdas_raw_input)
+  - dataFrameName: blacklist_reactions
+    # blacklist reactions is a one column (no headers) list of manual curated adverse events
+    # to ban from the FAERS database
+    # it is loaded and cached so this dataframe is not really a dataframe to save as doesn't
+    # return anything
+    sql:
+      SELECT
+        _c0 as reactions
+      FROM blacklist_input
+  - dataFrameName: fdas_pre1
+    # first ETL pass for fda lines. It basically selects the right fields and generate
+    # per line a list of reaction - drug pairs (reaction_drug_pairs) for further processing
+    # this list of pairs is the cartesian product per report-patient
+    sql:
+      SELECT *,
+        flatten(transform(patient_reaction,
+          reaction -> transform(patient_drug, drug -> (reaction,drug))
+        )) as reaction_drug_pairs
+      FROM (SELECT safetyreportid,
+              serious,
+              seriousnessdeath,
+              receivedate,
+              primarysource.qualification as qualification,
+              patient.reaction as patient_reaction,
+              patient.drug as patient_drug
+            FROM fdas_raw)
+  - dataFrameName: fdas_pre2
+    # the second ETL pass for fda before it becomes usable. It explode (reaction_drug_pairs)
+    # and unzip it into reaction, drug column again but exploded from a report-patient as
+    # it may contain multiple drug reaction so a cartesian product has to be built before
+    # explode it
+    sql:
+      SELECT safetyreportid,
+        serious,
+        receivedate,
+        seriousnessdeath,
+        qualification,
+        exploded_reaction_drug_pairs.reaction as reaction,
+        exploded_reaction_drug_pairs.drug as drug
+      FROM fdas_pre1 LATERAL VIEW explode(reaction_drug_pairs) as exploded_reaction_drug_pairs
+  - dataFrameName: fdas_drug_names
+    # basically we need a unified list of drug names to compare with as names are spread across
+    # multiple fields so those are combined into a unique set of drug names called drug_list
+    # this field will be used for exploding purposes
+    sql:
+      SELECT
+        *,
+        array_distinct(transform(
+            array_union(drug_brand_name_list,
+            array_union(array(drug_medicinalproduct),
+            array_union(drug_generic_name_list, drug_substance_name_list))),
+          d -> lower(d))
+        ) as drug_list
+      FROM (SELECT
+              drug.drugcharacterization as drug_characterization,
+              ifnull(seriousnessdeath, '0') as seriousness_death,
+              lower(reaction.reactionmeddrapt) as reaction_reactionmeddrapt,
+              ifnull(lower(drug.medicinalproduct), '') as drug_medicinalproduct,
+              ifnull(drug.openfda.generic_name, array()) as drug_generic_name_list,
+              ifnull(drug.openfda.brand_name, array()) as drug_brand_name_list,
+              ifnull(drug.openfda.substance_name, array()) as drug_substance_name_list,
+              safetyreportid,
+              serious,
+              receivedate,
+              qualification
+        FROM fdas_pre2)
+      WHERE
+        (qualification in ('1','2','3')) and
+        (drug_characterization = '1') and
+        isnotnull(reaction_reactionmeddrapt) and
+        isnotnull(safetyreportid) and
+        (seriousness_death = '0')
+  - dataFrameName: fdas_without_bl
+    # another ETL step before having the cleaned and lean fdas dataframe
+    # we remove blacklisted reactions
+    sql:
+      SELECT /*+ BROADCAST(blacklist_reactions) */
+        *
+      FROM fdas_drug_names
+      LEFT ANTI JOIN blacklist_reactions BL
+        ON (BL.reactions = fdas_drug_names.reaction_reactionmeddrapt)
+  - dataFrameName: fdas_without_bl_by_drug_name
+    # explode the drug_list field into a list of rows, one per drug name
+    sql:
+      SELECT
+        *,
+        drug_name
+      FROM fdas_without_bl LATERAL VIEW explode(drug_list) as drug_name
+output:
+  - dataFrameName: fdas_without_bl_by_drug_name
+    outputType: JSON
+    outputOptions:
+      saveMode: Overwrite
+      path: "fdas.json"

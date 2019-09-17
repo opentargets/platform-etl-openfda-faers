@@ -1,13 +1,9 @@
 metrics:
-  - openfda_metrics.yaml
+  - openfda_pre_metrics.yaml
 inputs:
-  drugs_input:
+  fdas_raw_input:
     file:
-      path: input/19.06_drug-data.json
-      format: JSON
-  fdas_parquet:
-    file:
-      path: "out/fdas.parquet"
+      path: "input/fdas_raw/*.json"
       format: JSON
       options:
         multiLine: "true"
@@ -25,4 +21,4 @@ output:
   file:
     dir: "out"
 logLevel: WARN
-appName: platformOFDAs
+appName: platformOFDAsPre
