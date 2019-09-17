@@ -5,6 +5,6 @@ java -Dspark.master=local[*] \
   -Dspark.executor.heartbeatInterval=60000 \
   -Dspark.sql.crossJoin.enabled=true \
   -Dspark.driver.maxResultSize=0 \
-  -Dspark.executor.memory=16g \
-  -Dspark.driver.memory=32g \
+  -Dspark.executor.memory=6g \
+  -Dspark.driver.memory=6g \
   -cp metorikku-standalone.jar com.yotpo.metorikku.Metorikku -c openfda_pre.yaml
