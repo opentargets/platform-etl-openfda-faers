@@ -5,11 +5,14 @@ steps:
     # as a root of the dataframe
     sql:
       SELECT
-        col.*
-      FROM (
-        SELECT
-          explode(results)
-        FROM fdas_raw_input)
+        col.safetyreportid as safetyreportid,
+        col.serious as serious,
+        col.seriousnessdeath as seriousnessdeath,
+        col.receivedate as receivedate,
+        col.primarysource.qualification as qualification,
+        col.patient.reaction as patient_reaction,
+        col.patient.drug as patient_drug
+      FROM fdas_raw_input LATERAL VIEW explode(results) as col
   - dataFrameName: blacklist_reactions
     # blacklist reactions is a one column (no headers) list of manual curated adverse events
     # to ban from the FAERS database
@@ -28,14 +31,7 @@ steps:
         flatten(transform(patient_reaction,
           reaction -> transform(patient_drug, drug -> (reaction,drug))
         )) as reaction_drug_pairs
-      FROM (SELECT safetyreportid,
-              serious,
-              seriousnessdeath,
-              receivedate,
-              primarysource.qualification as qualification,
-              patient.reaction as patient_reaction,
-              patient.drug as patient_drug
-            FROM fdas_raw)
+      FROM fdas_raw
   - dataFrameName: fdas_pre2
     # the second ETL pass for fda before it becomes usable. It explode (reaction_drug_pairs)
     # and unzip it into reaction, drug column again but exploded from a report-patient as
@@ -57,12 +53,12 @@ steps:
     sql:
       SELECT
         *,
-        filter(array_distinct(transform(
-            array_union(drug_brand_name_list,
-            array_union(array(drug_medicinalproduct),
-            array_union(drug_generic_name_list, drug_substance_name_list))),
-          d -> lower(d))
-        ), el -> el <> '') as drug_list
+        filter(array_distinct(transform(flatten(array(
+              drug_brand_name_list,
+              array(drug_medicinalproduct),
+              drug_generic_name_list,
+              drug_substance_name_list)),
+          d -> lower(d))), el -> el <> '') as drug_list
       FROM (SELECT
               drug.drugcharacterization as drug_characterization,
               ifnull(seriousnessdeath, '0') as seriousness_death,
