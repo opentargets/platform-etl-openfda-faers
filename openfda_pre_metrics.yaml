@@ -5,14 +5,14 @@ steps:
     # as a root of the dataframe
     sql:
       SELECT
-        col.safetyreportid as safetyreportid,
-        col.serious as serious,
-        col.seriousnessdeath as seriousnessdeath,
-        col.receivedate as receivedate,
-        col.primarysource.qualification as qualification,
-        col.patient.reaction as patient_reaction,
-        col.patient.drug as patient_drug
-      FROM fdas_raw_input LATERAL VIEW explode(results) as col
+        safetyreportid,
+        serious,
+        seriousnessdeath,
+        receivedate,
+        primarysource.qualification as qualification,
+        patient.reaction as patient_reaction,
+        patient.drug as patient_drug
+      FROM fdas_raw_input
   - dataFrameName: blacklist_reactions
     # blacklist reactions is a one column (no headers) list of manual curated adverse events
     # to ban from the FAERS database
@@ -28,9 +28,9 @@ steps:
     # this list of pairs is the cartesian product per report-patient
     sql:
       SELECT *,
-        flatten(transform(patient_reaction,
+        explode(flatten(transform(patient_reaction,
           reaction -> transform(patient_drug, drug -> (reaction,drug))
-        )) as reaction_drug_pairs
+        ))) as reaction_drug_pairs
       FROM fdas_raw
   - dataFrameName: fdas_pre2
     # the second ETL pass for fda before it becomes usable. It explode (reaction_drug_pairs)
@@ -43,9 +43,9 @@ steps:
         receivedate,
         seriousnessdeath,
         qualification,
-        exploded_reaction_drug_pairs.reaction as reaction,
-        exploded_reaction_drug_pairs.drug as drug
-      FROM fdas_pre1 LATERAL VIEW explode(reaction_drug_pairs) as exploded_reaction_drug_pairs
+        reaction_drug_pairs.reaction as reaction,
+        reaction_drug_pairs.drug as drug
+      FROM fdas_pre1
   - dataFrameName: fdas_drug_names
     # basically we need a unified list of drug names to compare with as names are spread across
     # multiple fields so those are combined into a unique set of drug names called drug_list
@@ -91,8 +91,9 @@ steps:
     # explode the drug_list field into a list of rows, one per drug name
     sql:
       SELECT
-        *
-      FROM fdas_without_bl LATERAL VIEW explode(drug_list) as drug_name
+        *,
+        explode(drug_list) as drug_name
+      FROM fdas_without_bl
 output:
   - dataFrameName: fdas_without_bl_by_drug_name
     outputType: Parquet

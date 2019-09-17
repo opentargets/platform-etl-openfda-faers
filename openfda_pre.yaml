@@ -5,9 +5,6 @@ inputs:
     file:
       path: "input/fdas_raw/*.json"
       format: JSON
-      options:
-        multiLine: "true"
-        mode: "DROPMALFORMED"
   blacklist_input:
     file:
       path: blacklisted_events.txt
