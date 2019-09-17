@@ -32,7 +32,7 @@ elasticdump --input=http://localhost:9200/19.06_drug-data \
     --sourceOnly
 ```
 
-#### Produce the raw json from scratch
+### Produce the raw json from scratch
 
 In the case you may want to generate all data again even the raw data this is the
 piece of bash scripts I used to produce it

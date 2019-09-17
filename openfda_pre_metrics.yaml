@@ -57,12 +57,12 @@ steps:
     sql:
       SELECT
         *,
-        array_distinct(transform(
+        array_filter(array_distinct(transform(
             array_union(drug_brand_name_list,
             array_union(array(drug_medicinalproduct),
             array_union(drug_generic_name_list, drug_substance_name_list))),
           d -> lower(d))
-        ) as drug_list
+        ), el -> el <> '') as drug_list
       FROM (SELECT
               drug.drugcharacterization as drug_characterization,
               ifnull(seriousnessdeath, '0') as seriousness_death,
