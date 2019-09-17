@@ -1,5 +1,6 @@
 metrics:
-  - openfda_metrics.yaml
+  - openfda_metrics_drugs.yaml
+  - openfda_metrics_targets.yaml
 inputs:
   drugs_input:
     file:

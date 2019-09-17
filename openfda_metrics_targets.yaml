@@ -1,0 +1,118 @@
+steps:
+  - dataFrameName: drugs
+    # drugs is a ETL process in order to get per chembl_id a list of drug names and target ids
+    # this df is the base for further extractions
+    sql:
+      SELECT
+        id as chembl_id,
+        transform(
+          array_distinct(
+            array_union(
+              trade_names,
+              array_union(array(pref_name), synonyms)
+            )
+          ),
+          ar -> lower(ar)) as drug_names,
+        array_distinct(flatten(transform(mechanisms_of_action, m ->
+          array_distinct(transform(m.target_components, t -> t.ensembl))))) as target_ids
+      FROM drugs_input
+  - dataFrameName: drugs_expl_by_name
+    # we use the df drugs to generate a list of (chembl_id, drug_name) where
+    # the pair chembl_id - drug_name is unique. Although chembl_id can be repeated
+    sql:
+      SELECT DISTINCT
+        D.chembl_id as chembl_id,
+        D.drug_name as drug_name
+      FROM (
+        SELECT
+          chembl_id,
+          explode(drug_names) as drug_name
+        FROM drugs) D
+      ORDER BY drug_name
+  - dataFrameName: drugs_expl_by_gene
+    # we use the df drugs to generate a list of (target_id, drug_name) where
+    # the pair target_id - drug_name is unique. Although target_id can be repeated
+    sql:
+      SELECT DISTINCT
+        drug_name,
+        target_id
+      FROM (
+        SELECT
+          chembl_id,
+          explode(target_ids) as target_id
+        FROM drugs)
+      INNER JOIN drugs_expl_by_name USING (chembl_id)
+      ORDER BY drug_name
+  - dataFrameName: fdas_without_bl_by_drug_name_inner_targets
+    # we repeat the previous process but using target_id this time as a
+    # way of llr given a pair (target_id, reaction)
+    # you can read the comments above in order to understand the code below
+    # but basically is the same but using target_id instead chembl_id
+    sql:
+      SELECT
+        *
+      FROM fdas_parquet
+      INNER JOIN drugs_expl_by_gene USING (drug_name)
+      WHERE isnotnull(target_id)
+  - dataFrameName: cached_uniq_reports_targets
+    sql:
+      SELECT
+          count(DISTINCT safetyreportid) as uniq_reports
+        FROM fdas_without_bl_by_drug_name_inner_targets
+  - dataFrameName: cached_uniq_reports_by_reactions_targets
+    sql:
+      SELECT
+          reaction_reactionmeddrapt,
+          count(DISTINCT safetyreportid) as uniq_report_ids_by_reaction
+        FROM fdas_without_bl_by_drug_name_inner_targets
+        GROUP BY reaction_reactionmeddrapt
+  - dataFrameName: cached_uniq_reports_by_targets
+    sql:
+      SELECT
+          target_id,
+          count(DISTINCT safetyreportid) as uniq_report_ids_by_target
+        FROM fdas_without_bl_by_drug_name_inner_targets
+        GROUP BY target_id
+  - dataFrameName: fdas_final_targets
+    sql:
+      SELECT
+        F.*,
+        R.uniq_report_ids_by_reaction,
+        D.uniq_report_ids_by_target,
+        E.*
+      FROM
+        fdas_without_bl_by_drug_name_inner_targets F
+        INNER JOIN cached_uniq_reports_by_reactions_targets R USING (reaction_reactionmeddrapt)
+        INNER JOIN cached_uniq_reports_by_targets D USING (target_id),
+        cached_uniq_reports_targets E
+  - dataFrameName: fdas_final_target_reaction
+    sql:
+      SELECT
+        target_id,
+        reaction_reactionmeddrapt,
+        A,
+        B,
+        C,
+        D,
+        (A * (ln(A) - ln(A + B))) as aterm,
+        (C * (ln(C) - ln(C + D))) as cterm,
+        ((A + C) * (ln(A + C) - ln(A + B + C + D))) as acterm,
+        ((A * (ln(A) - ln(A + B))) + (C * (ln(C) - ln(C + D))) - ((A + C) * (ln(A + C) - ln(A + B + C + D)))) as llr
+      FROM (
+        SELECT
+          target_id,
+          reaction_reactionmeddrapt,
+          count(DISTINCT safetyreportid) as A,
+          first(uniq_report_ids_by_reaction) as B,
+          first(uniq_report_ids_by_target) as C,
+          first(uniq_reports) as D
+        FROM fdas_final_targets
+        GROUP BY
+          target_id,
+          reaction_reactionmeddrapt)
+output:
+  - dataFrameName: fdas_final_target_reaction
+    outputType: JSON
+    outputOptions:
+      saveMode: Overwrite
+      path: "fdas_target_reaction.json"
