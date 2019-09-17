@@ -10,7 +10,7 @@ inputs:
         mode: "DROPMALFORMED"
   blacklist_input:
     file:
-      path: input/blacklist.csv
+      path: blacklisted_events.txt
       format: CSV
       options:
         sep: "\t"

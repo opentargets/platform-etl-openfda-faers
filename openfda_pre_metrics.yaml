@@ -57,7 +57,7 @@ steps:
     sql:
       SELECT
         *,
-        array_filter(array_distinct(transform(
+        filter(array_distinct(transform(
             array_union(drug_brand_name_list,
             array_union(array(drug_medicinalproduct),
             array_union(drug_generic_name_list, drug_substance_name_list))),
@@ -95,8 +95,7 @@ steps:
     # explode the drug_list field into a list of rows, one per drug name
     sql:
       SELECT
-        *,
-        drug_name
+        *
       FROM fdas_without_bl LATERAL VIEW explode(drug_list) as drug_name
 output:
   - dataFrameName: fdas_without_bl_by_drug_name
