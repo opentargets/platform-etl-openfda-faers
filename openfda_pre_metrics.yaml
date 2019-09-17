@@ -100,7 +100,7 @@ steps:
       FROM fdas_without_bl LATERAL VIEW explode(drug_list) as drug_name
 output:
   - dataFrameName: fdas_without_bl_by_drug_name
-    outputType: JSON
+    outputType: Parquet
     outputOptions:
       saveMode: Overwrite
-      path: "fdas.json"
+      path: "fdas.parquet"

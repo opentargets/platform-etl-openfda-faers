@@ -8,19 +8,10 @@ inputs:
   fdas_parquet:
     file:
       path: "out/fdas.parquet"
-      format: JSON
+      format: Parquet
       options:
         multiLine: "true"
         mode: "DROPMALFORMED"
-  blacklist_input:
-    file:
-      path: input/blacklist.csv
-      format: CSV
-      options:
-        sep: "\t"
-        ignoreLeadingWhiteSpace: "true"
-        ignoreTrailingWhiteSpace: "true"
-        header: "false"
 output:
   file:
     dir: "out"
