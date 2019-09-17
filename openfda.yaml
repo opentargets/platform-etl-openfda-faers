@@ -10,9 +10,6 @@ inputs:
     file:
       path: "out/fdas.parquet"
       format: Parquet
-      options:
-        multiLine: "true"
-        mode: "DROPMALFORMED"
 output:
   file:
     dir: "out"
