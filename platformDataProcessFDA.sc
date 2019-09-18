@@ -1,32 +1,33 @@
-import $ivy.`com.github.pathikrit::better-files:3.8.0`
 import $ivy.`com.typesafe:config:1.3.4`
 import $ivy.`com.github.fommil.netlib:all:1.1.2`
 import $ivy.`org.apache.spark::spark-core:2.4.3`
 import $ivy.`org.apache.spark::spark-mllib:2.4.3`
 import $ivy.`org.apache.spark::spark-sql:2.4.3`
 import $ivy.`com.github.pathikrit::better-files:3.8.0`
-import better.files.Dsl._
-import better.files._
-import better.files._
+import $ivy.`sh.almond::ammonite-spark:0.7.0`
+import ammonite.main.Router.main
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
-import org.apache.spark.storage.StorageLevel
-import breeze.linalg._
 
 object Loaders {
+  /** load a drug datasset from OpenTargets drug index dump */
   def loadDrugList(path: String)(implicit ss: SparkSession): DataFrame = {
     val drugList = ss.read.json(path)
       .selectExpr("id as chembl_id", "synonyms", "pref_name", "trade_names")
-      .withColumn("drug_names", array_distinct(array_union(col("trade_names"),array_union(array(col("pref_name")), col("synonyms")))))
+      .withColumn("drug_names", array_distinct(
+        flatten(
+          array(col("trade_names"), array(col("pref_name")), col("synonyms")))))
       .withColumn("_drug_name", explode(col("drug_names")))
       .withColumn("drug_name", lower(col("_drug_name")))
-      .select("chembl_id", "drug_name")
+      .select("chembl_id", "drug_name").distinct()
 
     drugList
   }
 
+  /** generate a target id set from the the drug index dump extracted from
+   * mechanisms of action */
   def loadTargetListFromDrugs(path: String)(implicit ss: SparkSession): DataFrame = {
     val tList = ss.read.json(path)
       .selectExpr("id as chembl_id", "mechanisms_of_action")
@@ -37,6 +38,7 @@ object Loaders {
     tList
   }
 
+  /** load initial OpenFDA FAERS json-lines and preselect needed fields  */
   def loadFDA(path: String)(implicit ss: SparkSession): DataFrame = {
     val fda = ss.read.json(path)
 
@@ -49,6 +51,7 @@ object Loaders {
     fda.selectExpr(columns:_*)
   }
 
+  /** load a blacklist of events you might want to exclude from the computations */
   def loadBlackList(path: String)(implicit ss: SparkSession): DataFrame = {
     val bl = ss.read
       .option("sep", "\t")
@@ -73,12 +76,14 @@ def main(drugSetPath: String, inputPathPrefix: String, outputPathPrefix: String,
     .config(sparkConf)
     .getOrCreate
 
+  // AmmoniteSparkSession.sync()
+
   import ss.implicits._
 
-  // load blacklist
-  val bl = ss.sparkContext
-    .broadcast(Loaders.loadBlackList(blackListPath).as[String]
-      .collectAsList())
+  /* load the blacklist terms collect as a list and broadcast the field to
+    all the cluster nodes thus it can be effectively used per row
+   */
+  val bl = Loaders.loadBlackList(blackListPath).cache()
 
   // the curated drug list we want
   val targetList = Loaders.loadTargetListFromDrugs(drugSetPath)
@@ -121,12 +126,13 @@ def main(drugSetPath: String, inputPathPrefix: String, outputPathPrefix: String,
       $"safetyreportid".isNotNull and $"seriousness_death" === "0" and
       $"drug_name" =!= "")
 
-  // remove blacklisted reactions
+  // remove blacklisted reactions using a left_anti which is the complement of
+  // left_semi so the ones from the left side which are not part of the equality
   val fdasFiltered = fdasF
-    .where(not($"reaction_reactionmeddrapt".isInCollection(bl.value)))
+    .join(bl, fdasF("reaction_reactionmeddrapt") === bl("reactions"), "left_anti")
 
-  val fdas = fdasFiltered
   // and we will need this processed data later on
+  val fdas = fdasFiltered
     .join(drugList, Seq("drug_name"), "inner")
 
   // total unique report ids count grouped by reaction
@@ -140,7 +146,7 @@ def main(drugSetPath: String, inputPathPrefix: String, outputPathPrefix: String,
   // total unique report ids
   val uniqReports = fdas.select("safetyreportid").distinct.count
 
-  // per drug-reaction pair
+  // compute llr and its needed terms as per drug-reaction pair
   val doubleAgg = fdas.groupBy(col("chembl_id"), col("reaction_reactionmeddrapt"))
     .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids"))
     .withColumnRenamed("uniq_report_ids", "A")
@@ -154,6 +160,7 @@ def main(drugSetPath: String, inputPathPrefix: String, outputPathPrefix: String,
     .withColumn("acterm", ($"A" + $"C") * (log($"A" + $"C") - log($"A" + $"B" + $"C" + $"D")) )
     .withColumn("llr", $"aterm" + $"cterm" - $"acterm")
 
+  // not all drugs have a target_id in their mechanisms of action
   val fdasT = fdas.where($"target_id".isNotNull)
 
   // total unique report ids
@@ -167,7 +174,7 @@ def main(drugSetPath: String, inputPathPrefix: String, outputPathPrefix: String,
   val aggByTargets = fdasT.groupBy($"target_id")
     .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids_by_target")).persist()
 
-  // same LLR but by target id instead of chembl drug id
+  // compute llr and its needed terms as per target-reaction pair
   val doubleAggTargets = fdasT.groupBy($"target_id", $"reaction_reactionmeddrapt")
     .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids"))
     .withColumnRenamed("uniq_report_ids", "A")
@@ -181,6 +188,7 @@ def main(drugSetPath: String, inputPathPrefix: String, outputPathPrefix: String,
     .withColumn("acterm", ($"A" + $"C") * (log($"A" + $"C") - log($"A" + $"B" + $"C" + $"D")) )
     .withColumn("llr", $"aterm" + $"cterm" - $"acterm")
 
+  // write the two datasets on disk as json-lines
   doubleAgg.write.json(outputPathPrefix + "/agg_by_chembl/")
   doubleAggTargets.write.json(outputPathPrefix + "/agg_by_target/")
 }
