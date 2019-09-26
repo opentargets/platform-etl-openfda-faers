@@ -4,7 +4,21 @@ OpenTargets ETL pipeline to process OpenFDA FAERS DB.
 
 The openFDA drug adverse event API returns data that has been collected from the FDA Adverse Event Reporting System (FAERS), a database that contains information on adverse event and medication error reports submitted to FDA.
 
-### Requirements
+### Summary
+
+1. openFDA FAERS data [download](https://open.fda.gov/apis/drug/event/download/) (~ 900 files)
+ 
+2. Pre-processing of this data using [platformDataProcessFDA.sc](https://github.com/opentargets/platform-etl-openfda-faers/blob/master/platformDataProcessFDA.sc) scala script:
+  - Filtering:
+    - Only reports submitted by health professionals (*primarysource.qualification* in (1,2,3)).
+    - Exclude reports that resulted in death (no entries with *seriousnessdeath*=1).  
+    - Only drugs that were considered by the reporter to be the cause of the event (*drugcharacterization*=1).
+    - Remove events (but not the whole report which might have multiple events) that are [blacklisted ](https://github.com/opentargets/platform-etl-openfda-faers/blob/master/blacklisted_events.txt)(blacklist curated manually to exclude events that are uninformative for our purposes).
+  - Match FDA drug names to Open Targets drug names & then map all these back to their ChEMBL id:
+    - Open Targets drug index fields:  *‘chembl_id’, ‘synonyms’, ‘pref_name’, ‘trade_names’*.
+    - openFDA adverse event data fields: *‘drug.medicinalproduct’, ‘drug.openfda.generic_name’, ‘drug.openfda.brand_name’, ‘drug.openfda.substance_name’*.
+  - Generate table where each row is a unique drug-event pair and count the number of report IDs for each pair, the total number of reports, the total number of reports per drug and the total number of reports per event. Using these calculate the fields required for estimating the significance of each event occuring for each drug, e.g. log-likelihood ratio, (llr) (based on [FDA LRT method](https://openfda.shinyapps.io/LRTest/_w_c5c2d04d/lrtmethod.pdf)).
+3. Calculate significance of each event for all drugs based on the FDA LRT method (Monte Carlo simulation) using the [openFDA_MonteCarlo_drugs.R](https://github.com/opentargets/platform-etl-openfda-faers/blob/master/R/openFDA_MonteCarlo_drugs.R) script. 
 
 ### Requirements
 
