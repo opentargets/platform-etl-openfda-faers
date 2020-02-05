@@ -12,13 +12,12 @@ lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.14.0"
 
 lazy val sparkSeq = Seq(
   "com.github.fommil.netlib" % "all" % "1.1.2" pomOnly(),
-  "org.apache.spark" %% "spark-core" % "2.4.3",
-  "org.apache.spark" %% "spark-sql" % "2.4.3",
-  "org.apache.spark" %% "spark-graphx" % "2.4.3",
-  "org.apache.spark" %% "spark-mllib" % "2.4.3"
+  "org.apache.spark" %% "spark-core" % "2.4.4",
+  "org.apache.spark" %% "spark-sql" % "2.4.4",
+  "org.apache.spark" %% "spark-graphx" % "2.4.4",
+  "org.apache.spark" %% "spark-mllib" % "2.4.4"
 )
-lazy val ammonite = "com.lihaoyi" % "ammonite" % "1.7.1" % "test" cross CrossVersion.full
-lazy val ammoniteSpark = "sh.almond" %% "ammonite-spark" % "0.7.0"
+lazy val ammonite = "com.lihaoyi" % "ammonite" % "2.0.4" % "test" cross CrossVersion.full
 //lazy val ammoniteDeps = Seq(
 //  "com.github.pathikrit" %% "better-files" % "3.8.0",
 //  "com.typesafe.play" %% "play-json" % "2.7.3",
@@ -29,7 +28,7 @@ lazy val root = (project in file("."))
   .settings(
     inThisBuild(List(
       organization := "io.opentargets",
-      scalaVersion := "2.12.9",
+      scalaVersion := "2.12.10",
       version := "0.1.0"
     )),
     name := "io-opentargets-etl-openfda-faers",
