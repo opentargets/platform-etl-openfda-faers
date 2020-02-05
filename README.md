@@ -53,7 +53,7 @@ cores=$(cat /proc/cpuinfo | grep processor | wc -l)
 split -d -n l/$cores files.txt f_
 
 for fname in $(ls -1 f_*); do
-    (for f in $(cat $fname); do wget -c "$f" -O - | gunzip > jq -r '.results[]|@json' > $(uuidgen -r)"_file.json"; done) &
+    (for f in $(cat $fname); do wget -c "$f" -O - | gunzip | jq -r '.results[]|@json' > $(uuidgen -r)"_file.json"; done) &
 done
 
 # wait for all processes to finish
