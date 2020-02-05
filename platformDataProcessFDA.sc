@@ -130,9 +130,9 @@ object Loaders {
         "drug_names",
         array_distinct(
           concat(col("drug_brand_name_list"),
-                  array(col("drug_medicinalproduct")),
-                  col("drug_generic_name_list"),
-                  col("drug_substance_name_list")))
+                 array(col("drug_medicinalproduct")),
+                 col("drug_generic_name_list"),
+                 col("drug_substance_name_list")))
       )
       // the final real drug name
       .withColumn("_drug_name", explode(col("drug_names")))
