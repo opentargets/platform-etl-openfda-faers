@@ -1,9 +1,8 @@
-import $ivy.`com.lihaoyi:ammonite:1.7.1`
 import $ivy.`com.typesafe:config:1.3.4`
 import $ivy.`com.github.fommil.netlib:all:1.1.2`
-import $ivy.`org.apache.spark::spark-core:2.4.3`
-import $ivy.`org.apache.spark::spark-mllib:2.4.3`
-import $ivy.`org.apache.spark::spark-sql:2.4.3`
+import $ivy.`org.apache.spark::spark-core:2.4.4`
+import $ivy.`org.apache.spark::spark-mllib:2.4.4`
+import $ivy.`org.apache.spark::spark-sql:2.4.4`
 import $ivy.`com.github.pathikrit::better-files:3.8.0`
 import $ivy.`sh.almond::ammonite-spark:0.7.0`
 import org.apache.spark.SparkConf
@@ -90,7 +89,7 @@ object Loaders {
     /* load the blacklist terms collect as a list and broadcast the field to
     all the cluster nodes thus it can be effectively used per row
      */
-    val bl = Loaders.loadBlackList(blackListPath).cache()
+    val bl = broadcast(Loaders.loadBlackList(blackListPath))
 
     // the curated drug list we want
     val targetList = Loaders.loadTargetListFromDrugs(drugSetPath)
@@ -130,11 +129,10 @@ object Loaders {
       .withColumn(
         "drug_names",
         array_distinct(
-          flatten(
-            array(col("drug_brand_name_list"),
+          concat(col("drug_brand_name_list"),
                   array(col("drug_medicinalproduct")),
                   col("drug_generic_name_list"),
-                  col("drug_substance_name_list"))))
+                  col("drug_substance_name_list")))
       )
       // the final real drug name
       .withColumn("_drug_name", explode(col("drug_names")))
