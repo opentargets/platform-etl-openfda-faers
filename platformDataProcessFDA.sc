@@ -64,6 +64,7 @@ object Loaders {
       .csv(path)
 
     bl.toDF("reactions")
+      .withColumn("reactions", translate(trim(lower(col("reactions"))), "^", "\\'"))
       .orderBy(col("reactions").asc)
   }
 }
@@ -113,7 +114,7 @@ object Loaders {
         "receivedate",
         "ifnull(seriousnessdeath, '0') as seriousness_death",
         "qualification",
-        "translate(lower(reaction.reactionmeddrapt), '^', '\\'') as reaction_reactionmeddrapt",
+        "trim(translate(lower(reaction.reactionmeddrapt), '^', '\\'')) as reaction_reactionmeddrapt",
         "ifnull(lower(drug.medicinalproduct), '') as drug_medicinalproduct",
         "ifnull(drug.openfda.generic_name, array()) as drug_generic_name_list",
         "ifnull(drug.openfda.brand_name, array()) as drug_brand_name_list",
