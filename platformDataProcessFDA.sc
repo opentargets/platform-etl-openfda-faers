@@ -1,13 +1,14 @@
 import $ivy.`com.typesafe:config:1.3.4`
 import $ivy.`com.github.fommil.netlib:all:1.1.2`
-import $ivy.`org.apache.spark::spark-core:2.4.4`
-import $ivy.`org.apache.spark::spark-mllib:2.4.4`
-import $ivy.`org.apache.spark::spark-sql:2.4.4`
+import $ivy.`org.apache.spark::spark-core:2.4.5`
+import $ivy.`org.apache.spark::spark-mllib:2.4.5`
+import $ivy.`org.apache.spark::spark-sql:2.4.5`
 import $ivy.`com.github.pathikrit::better-files:3.8.0`
 import $ivy.`sh.almond::ammonite-spark:0.7.0`
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.expressions._
 import org.apache.spark.sql.functions._
 
 object Loaders {
@@ -149,20 +150,27 @@ object Loaders {
     val fdasFiltered = fdasF
       .join(bl, fdasF("reaction_reactionmeddrapt") === bl("reactions"), "left_anti")
 
+    val wAdverses = Window.partitionBy(col("reaction_reactionmeddrapt"))
+    val wDrugs = Window.partitionBy(col("chembl_id"))
+    val wAdverseDrugComb = Window.partitionBy(col("chembl_id"), col("reaction_reactionmeddrapt"))
+
     // and we will need this processed data later on
     val fdas = fdasFiltered
       .join(drugList, Seq("drug_name"), "inner")
-
-    // total unique report ids count grouped by reaction
-    val aggByReactions = fdas
-      .groupBy(col("reaction_reactionmeddrapt"))
-      .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids_by_reaction"))
-      .persist()
-
-    // total unique report ids count grouped by drug name
-    val aggByDrugs = fdas
-      .groupBy(col("chembl_id"))
-      .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids_by_drug"))
+      .withColumn("uniq_report_ids_by_reaction",
+        countDistinct(col("safetyreportid")).over(wAdverses))
+      .withColumn("uniq_report_ids_by_drug",
+        countDistinct(col("safetyreportid")).over(wDrugs))
+      .withColumn("uniq_report_ids",
+        countDistinct(col("safetyreportid")).over(wAdverseDrugComb))
+      .select(
+        "safetyreportid",
+        "chembl_id",
+        "reaction_reactionmeddrapt",
+        "uniq_report_ids_by_reaction",
+        "uniq_report_ids_by_drug",
+        "uniq_report_ids"
+      )
       .persist()
 
     // total unique report ids
@@ -170,11 +178,8 @@ object Loaders {
 
     // compute llr and its needed terms as per drug-reaction pair
     val doubleAgg = fdas
-      .groupBy(col("chembl_id"), col("reaction_reactionmeddrapt"))
-      .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids"))
+      .withColumn("uniq_reports_total", lit(uniqReports))
       .withColumnRenamed("uniq_report_ids", "A")
-      .join(aggByDrugs, Seq("chembl_id"), "inner")
-      .join(aggByReactions, Seq("reaction_reactionmeddrapt"), "inner")
       .withColumn("C", col("uniq_report_ids_by_drug") - col("A"))
       .withColumn("B", col("uniq_report_ids_by_reaction") - col("A"))
       .withColumn("D",
@@ -185,42 +190,6 @@ object Loaders {
       .withColumn("acterm", ($"A" + $"C") * (log($"A" + $"C") - log($"A" + $"B" + $"C" + $"D")))
       .withColumn("llr", $"aterm" + $"cterm" - $"acterm")
 
-    // not all drugs have a target_id in their mechanisms of action
-    val fdasT = fdas.where($"target_id".isNotNull)
-
-    // total unique report ids
-    val uniqReportsT = fdasT.select("safetyreportid").distinct.count
-
-    // total unique report ids count grouped by reaction
-    val aggByReactionsT = fdasT
-      .groupBy(col("reaction_reactionmeddrapt"))
-      .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids_by_reaction"))
-      .persist()
-
-    // total unique report ids count grouped by target id
-    val aggByTargets = fdasT
-      .groupBy($"target_id")
-      .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids_by_target"))
-      .persist()
-
-    // compute llr and its needed terms as per target-reaction pair
-    val doubleAggTargets = fdasT
-      .groupBy($"target_id", $"reaction_reactionmeddrapt")
-      .agg(countDistinct(col("safetyreportid")).as("uniq_report_ids"))
-      .withColumnRenamed("uniq_report_ids", "A")
-      .join(aggByTargets, Seq("target_id"), "inner")
-      .join(aggByReactionsT, Seq("reaction_reactionmeddrapt"), "inner")
-      .withColumn("C", col("uniq_report_ids_by_target") - col("A"))
-      .withColumn("B", col("uniq_report_ids_by_reaction") - col("A"))
-      .withColumn("D",
-                  lit(uniqReportsT) - col("uniq_report_ids_by_target") - col(
-                    "uniq_report_ids_by_reaction") + col("A"))
-      .withColumn("aterm", $"A" * (log($"A") - log($"A" + $"B")))
-      .withColumn("cterm", $"C" * (log($"C") - log($"C" + $"D")))
-      .withColumn("acterm", ($"A" + $"C") * (log($"A" + $"C") - log($"A" + $"B" + $"C" + $"D")))
-      .withColumn("llr", $"aterm" + $"cterm" - $"acterm")
-
     // write the two datasets on disk as json-lines
     doubleAgg.write.json(outputPathPrefix + "/agg_by_chembl/")
-    doubleAggTargets.write.json(outputPathPrefix + "/agg_by_target/")
   }

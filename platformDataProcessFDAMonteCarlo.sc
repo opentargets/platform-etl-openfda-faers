@@ -1,9 +1,9 @@
 import $ivy.`com.github.pathikrit::better-files:3.8.0`
 import $ivy.`com.typesafe:config:1.3.4`
 import $ivy.`com.github.fommil.netlib:all:1.1.2`
-import $ivy.`org.apache.spark::spark-core:2.4.3`
-import $ivy.`org.apache.spark::spark-mllib:2.4.3`
-import $ivy.`org.apache.spark::spark-sql:2.4.3`
+import $ivy.`org.apache.spark::spark-core:2.4.5`
+import $ivy.`org.apache.spark::spark-mllib:2.4.5`
+import $ivy.`org.apache.spark::spark-sql:2.4.5`
 import $ivy.`com.github.pathikrit::better-files:3.8.0`
 import better.files.Dsl._
 import better.files._
