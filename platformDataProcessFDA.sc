@@ -179,16 +179,18 @@ object Loaders {
     // compute llr and its needed terms as per drug-reaction pair
     val doubleAgg = fdas
       .withColumn("uniq_reports_total", lit(uniqReports))
+      .drop("safetyreportid")
       .withColumnRenamed("uniq_report_ids", "A")
       .withColumn("C", col("uniq_report_ids_by_drug") - col("A"))
       .withColumn("B", col("uniq_report_ids_by_reaction") - col("A"))
       .withColumn("D",
-                  lit(uniqReports) - col("uniq_report_ids_by_drug") - col(
+                  col("uniq_reports_total") - col("uniq_report_ids_by_drug") - col(
                     "uniq_report_ids_by_reaction") + col("A"))
       .withColumn("aterm", $"A" * (log($"A") - log($"A" + $"B")))
       .withColumn("cterm", $"C" * (log($"C") - log($"C" + $"D")))
       .withColumn("acterm", ($"A" + $"C") * (log($"A" + $"C") - log($"A" + $"B" + $"C" + $"D")))
       .withColumn("llr", $"aterm" + $"cterm" - $"acterm")
+      .distinct()
 
     // write the two datasets on disk as json-lines
     doubleAgg.write.json(outputPathPrefix + "/agg_by_chembl/")
