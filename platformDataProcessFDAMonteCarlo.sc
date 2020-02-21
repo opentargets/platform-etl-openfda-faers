@@ -11,6 +11,7 @@ import better.files._
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.expressions._
 import org.apache.spark.sql.functions._
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.ml.linalg.{DenseVector, Matrix, Vectors}
@@ -69,13 +70,13 @@ def main(inputPath: String, outputPathPrefix: String): Unit = {
 
     // logLR <- x * (log(x) - log(y)) + (z-x) * (log(z - x) - log(n - y))
     // myLLRs <- myLLRs - n_j * log(n_j) + n_j * log(n)
-    val logxy = logx(::,*) -:- logy
-    val logzxy = logzx(::,*) -:- logNy
+    val logxy = logx(::, *) -:- logy
+    val logzxy = logzx(::, *) -:- logNy
     val logLR = (x *:* logxy +:+ zx *:* logzxy) - z * math.log(z) + z * math.log(N)
 
     logLR(logLR.findAll(e => e.isNaN || e.isInfinity)) := 0.0
 
-    val llrs = breeze.linalg.max(logLR(*,::))
+    val llrs = breeze.linalg.max(logLR(*, ::))
 
     println(s"LLR ${llrs.toString}")
 
@@ -88,12 +89,18 @@ def main(inputPath: String, outputPathPrefix: String): Unit = {
 
   val critVal = fdas
     .where($"chembl_id" === "CHEMBL714")
-    .withColumn("n", $"D" + $"uniq_report_ids_by_drug" + $"uniq_report_ids_by_reaction" - $"A")
     .groupBy($"chembl_id")
-    .agg(first($"uniq_report_ids_by_drug").as("n_j"),
+    .agg(first($"uniq_report_ids_by_drug").as("uniq_report_ids_by_drug"),
       collect_list($"uniq_report_ids_by_reaction").as("n_i"),
-      first($"n").as("n"))
-    .withColumn("critVal", udfProbVector(lit(1000), $"n_j", $"n_i", $"n", lit(0.95)))
+      first($"uniq_reports_total").as("uniq_reports_total"),
+      first($"uniq_report_ids").as("uniq_report_ids"))
+    .withColumn("critVal",
+      udfProbVector(lit(1000),
+        $"uniq_report_ids_by_drug",
+        $"n_i", $"uniq_report_ids",
+        lit(0.95)
+      )
+    )
 
   fdas.join(critVal.select("chembl_id", "critVal"), Seq("chembl_id"), "inner")
     .write
