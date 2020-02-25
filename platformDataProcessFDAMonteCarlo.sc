@@ -1,13 +1,10 @@
-import $ivy.`com.github.pathikrit::better-files:3.8.0`
 import $ivy.`com.typesafe:config:1.3.4`
 import $ivy.`com.github.fommil.netlib:all:1.1.2`
 import $ivy.`org.apache.spark::spark-core:2.4.5`
 import $ivy.`org.apache.spark::spark-mllib:2.4.5`
 import $ivy.`org.apache.spark::spark-sql:2.4.5`
 import $ivy.`com.github.pathikrit::better-files:3.8.0`
-import better.files.Dsl._
-import better.files._
-import better.files._
+import $ivy.`sh.almond::ammonite-spark:0.7.0`
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
@@ -17,6 +14,56 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.ml.linalg.{DenseVector, Matrix, Vectors}
 import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV, SparseVector => BSV, Vector => BV}
 import breeze.stats.distributions.RandBasis
+import breeze.linalg._
+
+import scala.annotation.tailrec
+import scala.util.Try
+
+object MathHelpers {
+
+  /** rmultinom(n, size, prob) from R
+    *
+    * @link https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Multinom.html
+    *      Here the implementation reference
+    */
+  def rmultinom(n: Int, size: Int, probV: BDV[Double]): BDM[Double] = {
+    @tailrec
+    def _rmultinom(bin: breeze.stats.distributions.Binomial,
+                   size: Int,
+                   probV: BDV[Double],
+                   binomialList: IndexedSeq[Int]): IndexedSeq[Int] = {
+      if (binomialList.size >= probV.size)
+        binomialList
+      else {
+        if (binomialList.isEmpty)
+          _rmultinom(bin, size, probV, IndexedSeq(bin.sample))
+        else {
+          val blSize = binomialList.size
+          val P = probV(blSize) / (1D - breeze.linalg.sum(probV(0 until blSize)))
+          val N = math.abs(size - binomialList.sum)
+          val Bin = Try(breeze.stats.distributions.Binomial(N, P))
+
+          _rmultinom(bin, size, probV, binomialList :+ Bin.map(_.sample).getOrElse(0))
+        }
+      }
+    }
+
+    require(probV.size > 0 && size > 0, "the probability vector must be > 0 and the size > 0")
+
+    val X: BDM[Double] = BDM.zeros(probV.size, n)
+    val p = probV / breeze.linalg.max(probV)
+
+    println(s"size X ${X.rows}:${X.cols}")
+    val Bin = breeze.stats.distributions.Binomial(size, p(0))
+    for (i <- 0 until n) {
+      val sample: BDV[Int] = BDV(_rmultinom(Bin, size, p, IndexedSeq()).toArray)
+      X(::, i) := breeze.linalg.convert(sample, Double)
+    }
+
+    X
+  }
+
+}
 
 object Loaders {
   def loadAggFDA(path: String)(implicit ss: SparkSession): DataFrame =
@@ -24,85 +71,79 @@ object Loaders {
 }
 
 @main
-def main(inputPath: String, outputPathPrefix: String): Unit = {
-  val sparkConf = new SparkConf()
-    .set("spark.driver.maxResultSize", "0")
-    .setAppName("similarities-loaders")
-    .setMaster("local[*]")
+  def main(inputPath: String, outputPathPrefix: String): Unit = {
+    val sparkConf = new SparkConf()
+      .set("spark.driver.maxResultSize", "0")
+      .setAppName("similarities-loaders")
+      .setMaster("local[*]")
 
-  implicit val ss = SparkSession.builder
-    .config(sparkConf)
-    .getOrCreate
+    implicit val ss = SparkSession.builder
+      .config(sparkConf)
+      .getOrCreate
 
-  import ss.implicits._
+    import ss.implicits._
 
-  val fdas = Loaders.loadAggFDA(inputPath)
+    val fdas = Loaders.loadAggFDA(inputPath)
 
-  val udfProbVector = udf((permutations: Int, n_j: Int, n_i: Seq[Long], n: Int, prob: Double) => {
-    import breeze.linalg._
-    import breeze.stats._
-    // get the Pvector normalised by max element not sure i need to do it
-    val z = n_j.toDouble
-    val N = n.toDouble
-    val y = convert(BDV(n_i.toArray), Double)
-    val Pvector = y / N
-    val maxPv = breeze.linalg.max(Pvector)
-    Pvector := Pvector / maxPv
+    /**
+      * multinomial with parameter n_j for all n_i / n
+      * n - total number of reports
+      * prob - top percentile in term of probability (0,1)
+      * n_i - vector of the counts of reports of each adverse (i) event per drug
+      * n_j - the counts of reports of the drug j
+      * permutations - number of times per drug (j)
+      */
+    val udfProbVector = udf(
+      (permutations: Int, n_j: Int, n_i: Seq[Long], n: Int, n_ij: Long, prob: Double) => {
+        import breeze.linalg._
+        import breeze.stats._
+        val z = n_j.toDouble
+        val A = n_ij.toDouble
+        val N = n.toDouble
+        val y = convert(BDV(n_i.toArray), Double)
+        val probV = y / N
+        val x: BDM[Double] = BDM.zeros(probV.size, permutations)
 
-    println(s"values nj $n_j ni size ${n_i.length} n $n")
-    // generate the multinorm permutations
-    val mult = breeze.stats.distributions.Multinomial(Pvector)
-    val x = BDM.zeros[Double](Pvector.size, permutations)
+        x := MathHelpers.rmultinom(permutations, n_j, probV)
 
-    // generate n_i columns
-    for (i <- 0 until permutations) {
-      x(::, i) := convert(BDV(mult.samples.take(Pvector.size).toArray), Double)
-    }
+        val B = x - A
+        val C = z - A
+        val D = N - z - x + A
 
-    println(x.toString)
+        val aterm = A * (math.log(A) - breeze.numerics.log(A +:+ B))
+        val cterm = C * (math.log(C) - breeze.numerics.log(C +:+ D))
+        val acterm = (A + C) * (math.log(A + C) - breeze.numerics.log((A +:+ B) + (C +:+ D)))
+        val llr: BDM[Double] = aterm +:+ cterm -:- acterm
 
-    // compute all llrs in one go
-    val logx: BDM[Double] = breeze.numerics.log(x)
-    val zx: BDM[Double] = z - x
-    val logzx: BDM[Double] = breeze.numerics.log(zx)
-    val logNy: BDV[Double] = breeze.numerics.log(N - y)
-    val logy: BDV[Double] = breeze.numerics.log(y)
+        llr(llr.findAll(e => e.isNaN || e.isInfinity)) := 0.0
 
-    // logLR <- x * (log(x) - log(y)) + (z-x) * (log(z - x) - log(n - y))
-    // myLLRs <- myLLRs - n_j * log(n_j) + n_j * log(n)
-    val logxy = logx(::, *) -:- logy
-    val logzxy = logzx(::, *) -:- logNy
-    val logLR = (x *:* logxy +:+ zx *:* logzxy) - z * math.log(z) + z * math.log(N)
+        val llrs = breeze.linalg.max(llr(::, *))
+        val critVal = DescriptiveStats.percentile(llrs.t.data, prob)
 
-    logLR(logLR.findAll(e => e.isNaN || e.isInfinity)) := 0.0
+        critVal
+      })
 
-    val llrs = breeze.linalg.max(logLR(*, ::))
-
-    println(s"LLR ${llrs.toString}")
-
-    // get the prob percentile value as a critical value
-    val critVal = DescriptiveStats.percentile(llrs.data, prob)
-    println(s"FDA CRITVAL ${critVal.toString}")
-
-    critVal
-  })
-
-  val critVal = fdas
-    .where($"chembl_id" === "CHEMBL714")
-    .groupBy($"chembl_id")
-    .agg(first($"uniq_report_ids_by_drug").as("uniq_report_ids_by_drug"),
-      collect_list($"uniq_report_ids_by_reaction").as("n_i"),
-      first($"uniq_reports_total").as("uniq_reports_total"),
-      first($"uniq_report_ids").as("uniq_report_ids"))
-    .withColumn("critVal",
-      udfProbVector(lit(1000),
-        $"uniq_report_ids_by_drug",
-        $"n_i", $"uniq_report_ids",
-        lit(0.95)
+    val critVal = fdas
+      .where($"chembl_id" === "CHEMBL714")
+      .withColumn("uniq_reports_total", $"A" + $"B" + $"C" + $"D")
+      .groupBy($"chembl_id")
+      .agg(
+        first($"uniq_report_ids_by_drug").as("uniq_report_ids_by_drug"),
+        collect_list($"uniq_report_ids_by_reaction").as("n_i"),
+        first($"uniq_reports_total").as("uniq_reports_total"),
+        first($"A").as("uniq_report_ids")
       )
-    )
+      .withColumn("critVal",
+                  udfProbVector(lit(1000),
+                                $"uniq_report_ids_by_drug",
+                                $"n_i",
+                                $"uniq_reports_total",
+                                $"uniq_report_ids",
+                                lit(0.95)))
 
-  fdas.join(critVal.select("chembl_id", "critVal"), Seq("chembl_id"), "inner")
-    .write
-    .json(outputPathPrefix + "/agg_critval/")
-}
+    fdas
+      .join(critVal.select("chembl_id", "critVal"), Seq("chembl_id"), "inner")
+      .where(col("llr") > col("critVal"))
+      .write
+      .json(outputPathPrefix + "/agg_critval/")
+  }
