@@ -138,7 +138,7 @@ object Loaders {
                                 $"n_i",
                                 $"uniq_reports_total",
                                 $"uniq_report_ids",
-                                lit(0.95)))
+                                lit(0.99)))
 
     fdas
       .join(critVal.select("chembl_id", "critVal"), Seq("chembl_id"), "inner")
