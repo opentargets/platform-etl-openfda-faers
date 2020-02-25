@@ -53,7 +53,6 @@ object MathHelpers {
     val X: BDM[Double] = BDM.zeros(probV.size, n)
     val p = probV / breeze.linalg.max(probV)
 
-    println(s"size X ${X.rows}:${X.cols}")
     val Bin = breeze.stats.distributions.Binomial(size, p(0))
     for (i <- 0 until n) {
       val sample: BDV[Int] = BDV(_rmultinom(Bin, size, p, IndexedSeq()).toArray)
