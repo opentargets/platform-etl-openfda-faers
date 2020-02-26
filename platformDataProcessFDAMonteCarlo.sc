@@ -93,7 +93,7 @@ object Loaders {
 
         x := MathHelpers.rmultinom(permutations, n_j, probV)
 
-        val LLRS: BDM[Double] = BDM.zeros(permutations, probV.size)
+        val LLRS: BDM[Double] = BDM.zeros(probV.size, permutations)
 
         for (c <- 0 until probV.size) {
           val X = x(c, ::).t
@@ -101,7 +101,7 @@ object Loaders {
           val ly = math.log(y(c))
           val lzX = breeze.numerics.log(z - X)
           val XX = X *:* (lX - ly) + (z - X) *:* (lzX - math.log(N - y(c)))
-          LLRS(::, c) := XX
+          LLRS(c, ::) := XX.t
         }
 
         LLRS := LLRS - z * math.log(z) + z * math.log(N)
