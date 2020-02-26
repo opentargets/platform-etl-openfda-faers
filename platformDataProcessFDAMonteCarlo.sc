@@ -27,41 +27,27 @@ object MathHelpers {
     *      Here the implementation reference
     */
   def rmultinom(n: Int, size: Int, probV: BDV[Double]): BDM[Double] = {
-    @tailrec
-    def _rmultinom(bin: breeze.stats.distributions.Binomial,
-                   size: Int,
-                   probV: BDV[Double],
-                   binomialList: Array[Int]): Array[Int] = {
-      if (binomialList.length >= probV.size)
-        binomialList
-      else {
-        if (binomialList.isEmpty)
-          _rmultinom(bin, size, probV, Array(bin.sample))
-        else {
-          val blSize = binomialList.length
-          val P = probV(blSize) / (1D - breeze.linalg.sum(probV(0 until blSize)))
-          val N = math.abs(size - binomialList.sum)
-
-          val Bin = N match {
-            case 0 => None
-            case _ => Some(breeze.stats.distributions.Binomial(N, P))
-          }
-
-          _rmultinom(bin, size, probV, binomialList :+ Bin.map(_.sample).getOrElse(0))
-        }
-      }
-    }
-
     require(probV.size > 0 && size > 0, "the probability vector must be > 0 and the size > 0")
 
     val X: BDM[Double] = BDM.zeros(probV.size, n)
-    val p = probV / breeze.linalg.max(probV)
+    val p = probV / breeze.linalg.sum(probV)
 
     val Bin = breeze.stats.distributions.Binomial(size, p(0))
     for (i <- 0 until n) {
-      val sampleIter: Array[Int] = Array()
-      val sample: BDV[Int] = BDV(_rmultinom(Bin, size, p, sampleIter))
-      X(::, i) := breeze.linalg.convert(sample, Double)
+      // get first sample each permutation
+      X(0, i) = Bin.sample().toDouble
+
+      for (j <- 1 until p.size) {
+        val P = p(j) / (1D - breeze.linalg.sum(p(0 until j)))
+        val N = math.abs(size - breeze.linalg.sum(X(0 until j, i))).toInt
+
+        val Binj = N match {
+          case 0 => 0
+          case _ => breeze.stats.distributions.Binomial(N, P).sample
+        }
+
+        X(j, i) = Binj.toDouble
+      }
     }
 
     X
@@ -75,7 +61,10 @@ object Loaders {
 }
 
 @main
-  def main(inputPath: String, outputPathPrefix: String): Unit = {
+  def main(inputPath: String,
+           outputPathPrefix: String,
+           percentile: Double = 0.99,
+           permutations: Int = 100): Unit = {
     val sparkConf = new SparkConf()
       .set("spark.driver.maxResultSize", "0")
       .setAppName("similarities-loaders")
@@ -108,10 +97,7 @@ object Loaders {
         val probV = y / N
         val x: BDM[Double] = BDM.zeros(probV.size, permutations)
 
-        val t0 = System.nanoTime()
         x := MathHelpers.rmultinom(permutations, n_j, probV)
-        val t1 = System.nanoTime()
-//        println(s"done computing rmultinom ${(t1 - t0)/1000000}")
         val B = x - A
         val C = z - A
         val D = N - z - x + A
@@ -122,38 +108,44 @@ object Loaders {
         val llr: BDM[Double] = aterm +:+ cterm -:- acterm
 
         llr(llr.findAll(e => e.isNaN || e.isInfinity)) := 0.0
-
         val llrs = breeze.linalg.max(llr(::, *))
-
-        val t2 = System.nanoTime()
-//        println(s"llrs ${(t2 - t1)/1000000} size ${llrs.t.size}")
         val critVal = DescriptiveStats.percentile(llrs.t.activeValuesIterator, prob)
 
         critVal
       })
 
+    val wDrug = Window.partitionBy($"chembl_id")
+    val wEvent = Window.partitionBy($"reaction_reactionmeddrapt")
     val critVal = fdas
-//      .where($"chembl_id" === "CHEMBL714")
       .withColumn("uniq_reports_total", $"A" + $"B" + $"C" + $"D")
-      .groupBy($"chembl_id")
-      .agg(
-        first($"uniq_report_ids_by_drug").as("uniq_report_ids_by_drug"),
-        collect_list($"uniq_report_ids_by_reaction").as("n_i"),
-        first($"uniq_reports_total").as("uniq_reports_total"),
-        first($"A").as("uniq_report_ids")
-      )
-      .withColumn("critVal",
-                  udfProbVector(lit(100),
-                                $"uniq_report_ids_by_drug",
-                                $"n_i",
-                                $"uniq_reports_total",
-                                $"uniq_report_ids",
-                                lit(0.99)))
+      .withColumn("uniq_report_ids", $"A")
+      .withColumn("n_i", collect_list($"uniq_report_ids_by_reaction").over(wDrug))
+      .withColumn("n_j", collect_list($"uniq_report_ids_by_drug").over(wEvent))
+      .withColumn("critVal_drug",
+        udfProbVector(lit(permutations),
+          $"uniq_report_ids_by_drug",
+          $"n_i",
+          $"uniq_reports_total",
+          $"uniq_report_ids",
+          lit(percentile)))
+      .withColumn("critVal_event",
+        udfProbVector(lit(permutations),
+          $"uniq_report_ids_by_reaction",
+          $"n_j",
+          $"uniq_reports_total",
+          $"uniq_report_ids",
+          lit(percentile)))
+      .drop("uniq_reports_total", "uniq_report_ids", "n_i", "n_j")
       .persist(StorageLevel.DISK_ONLY)
 
-    fdas
-      .join(critVal.select("chembl_id", "critVal"), Seq("chembl_id"), "inner")
-      .where(col("llr") > col("critVal"))
+    critVal
+      .where(col("llr") > col("critVal_drug"))
       .write
-      .json(outputPathPrefix + "/agg_critval/")
+      .json(outputPathPrefix + "/agg_critval_drug/")
+
+  critVal
+    .where(col("llr") > col("critVal_event"))
+    .write
+    .json(outputPathPrefix + "/agg_critval_event/")
+
   }
