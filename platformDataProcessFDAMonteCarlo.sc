@@ -78,14 +78,6 @@ object Loaders {
 
     val fdas = Loaders.loadAggFDA(inputPath)
 
-    /**
-      * multinomial with parameter n_j for all n_i / n
-      * n - total number of reports
-      * prob - top percentile in term of probability (0,1)
-      * n_i - vector of the counts of reports of each adverse (i) event per drug
-      * n_j - the counts of reports of the drug j
-      * permutations - number of times per drug (j)
-      */
     val udfProbVector = udf(
       (permutations: Int, n_j: Int, n_i: Seq[Long], n: Int, n_ij: Long, prob: Double) => {
         import breeze.linalg._
@@ -98,16 +90,6 @@ object Loaders {
         val x: BDM[Double] = BDM.zeros(probV.size, permutations)
 
         x := MathHelpers.rmultinom(permutations, n_j, probV)
-
-        //  myLLRs <- t(sapply(1:length(Pvector), function(i){
-        //    logLRnum(Simulatej[i, ], n_i[i], n_j, n)
-        //  }))
-        //  myLLRs <- myLLRs - n_j * log(n_j) + n_j * log(n)
-        //
-        // logLRnum<-function(x, y, z, n){
-        //  logLR <- x * (log(x) - log(y)) + (z-x) * (log(z - x) - log(n - y))
-        //  return(logLR)
-        //}
 
         val LLRS: BDM[Double] = BDM.zeros(permutations, probV.size)
 
@@ -124,19 +106,6 @@ object Loaders {
         LLRS(LLRS.findAll(e => e.isNaN || e.isInfinity)) := 0.0
         val maxLLRS = breeze.linalg.max(LLRS(::, *))
         val critVal = DescriptiveStats.percentile(maxLLRS.t.data, prob)
-
-//        val B = x - A
-//        val C = z - A
-//        val D = N - z - x + A
-//
-//        val aterm = A * (math.log(A) - breeze.numerics.log(A +:+ B))
-//        val cterm = C * (math.log(C) - breeze.numerics.log(C +:+ D))
-//        val acterm = (A + C) * (math.log(A + C) - breeze.numerics.log((A +:+ B) + (C +:+ D)))
-//        val llr: BDM[Double] = aterm +:+ cterm -:- acterm
-//
-//        llr(llr.findAll(e => e.isNaN || e.isInfinity)) := 0.0
-//        val llrs = breeze.linalg.max(llr(::, *))
-//        val critVal = DescriptiveStats.percentile(llrs.t.activeValuesIterator, prob)
 
         critVal
       })
