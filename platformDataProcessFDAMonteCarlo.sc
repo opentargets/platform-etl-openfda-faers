@@ -98,54 +98,72 @@ object Loaders {
         val x: BDM[Double] = BDM.zeros(probV.size, permutations)
 
         x := MathHelpers.rmultinom(permutations, n_j, probV)
-        val B = x - A
-        val C = z - A
-        val D = N - z - x + A
 
-        val aterm = A * (math.log(A) - breeze.numerics.log(A +:+ B))
-        val cterm = C * (math.log(C) - breeze.numerics.log(C +:+ D))
-        val acterm = (A + C) * (math.log(A + C) - breeze.numerics.log((A +:+ B) + (C +:+ D)))
-        val llr: BDM[Double] = aterm +:+ cterm -:- acterm
+        //  myLLRs <- t(sapply(1:length(Pvector), function(i){
+        //    logLRnum(Simulatej[i, ], n_i[i], n_j, n)
+        //  }))
+        //  myLLRs <- myLLRs - n_j * log(n_j) + n_j * log(n)
+        //
+        // logLRnum<-function(x, y, z, n){
+        //  logLR <- x * (log(x) - log(y)) + (z-x) * (log(z - x) - log(n - y))
+        //  return(logLR)
+        //}
 
-        llr(llr.findAll(e => e.isNaN || e.isInfinity)) := 0.0
-        val llrs = breeze.linalg.max(llr(::, *))
-        val critVal = DescriptiveStats.percentile(llrs.t.activeValuesIterator, prob)
+        val LLRS: BDM[Double] = BDM.zeros(permutations, probV.size)
+
+        for (c <- 0 until probV.size) {
+          val X = x(c, ::).t
+          val lX = breeze.numerics.log(X)
+          val ly = math.log(y(c))
+          val lzX = breeze.numerics.log(z - X)
+          val XX = X *:* (lX - ly) + (z - X) *:* (lzX - math.log(N - y(c)))
+          LLRS(::, c) := XX
+        }
+
+        LLRS := LLRS - z * math.log(z) + z * math.log(N)
+        LLRS(LLRS.findAll(e => e.isNaN || e.isInfinity)) := 0.0
+        val maxLLRS = breeze.linalg.max(LLRS(::, *))
+        val critVal = DescriptiveStats.percentile(maxLLRS.t.data, prob)
+
+//        val B = x - A
+//        val C = z - A
+//        val D = N - z - x + A
+//
+//        val aterm = A * (math.log(A) - breeze.numerics.log(A +:+ B))
+//        val cterm = C * (math.log(C) - breeze.numerics.log(C +:+ D))
+//        val acterm = (A + C) * (math.log(A + C) - breeze.numerics.log((A +:+ B) + (C +:+ D)))
+//        val llr: BDM[Double] = aterm +:+ cterm -:- acterm
+//
+//        llr(llr.findAll(e => e.isNaN || e.isInfinity)) := 0.0
+//        val llrs = breeze.linalg.max(llr(::, *))
+//        val critVal = DescriptiveStats.percentile(llrs.t.activeValuesIterator, prob)
 
         critVal
       })
 
-    val wDrug = Window.partitionBy($"chembl_id")
-    val wEvent = Window.partitionBy($"reaction_reactionmeddrapt")
-    val critVal = fdas
+    val critValDrug = fdas
       .withColumn("uniq_reports_total", $"A" + $"B" + $"C" + $"D")
       .withColumn("uniq_report_ids", $"A")
-      .withColumn("n_i", collect_list($"uniq_report_ids_by_reaction").over(wDrug))
-      .withColumn("n_j", collect_list($"uniq_report_ids_by_drug").over(wEvent))
+      .groupBy($"chembl_id")
+      .agg(
+        first($"uniq_reports_total").as("uniq_reports_total"),
+        first($"uniq_report_ids").as("uniq_report_ids"),
+        collect_list($"uniq_report_ids_by_reaction").as("n_i"),
+        first($"uniq_report_ids_by_drug").as("uniq_report_ids_by_drug"),
+      )
       .withColumn("critVal_drug",
-        udfProbVector(lit(permutations),
-          $"uniq_report_ids_by_drug",
-          $"n_i",
-          $"uniq_reports_total",
-          $"uniq_report_ids",
-          lit(percentile)))
-      .withColumn("critVal_event",
-        udfProbVector(lit(permutations),
-          $"uniq_report_ids_by_reaction",
-          $"n_j",
-          $"uniq_reports_total",
-          $"uniq_report_ids",
-          lit(percentile)))
-      .drop("uniq_reports_total", "uniq_report_ids", "n_i", "n_j")
+                  udfProbVector(lit(permutations),
+                                $"uniq_report_ids_by_drug",
+                                $"n_i",
+                                $"uniq_reports_total",
+                                $"uniq_report_ids",
+                                lit(percentile)))
+      .select("chembl_id", "critVal_drug")
       .persist(StorageLevel.DISK_ONLY)
 
-    critVal
+    fdas
+      .join(critValDrug, Seq("chembl_id"), "inner")
       .where(col("llr") > col("critVal_drug"))
       .write
       .json(outputPathPrefix + "/agg_critval_drug/")
-
-  critVal
-    .where(col("llr") > col("critVal_event"))
-    .write
-    .json(outputPathPrefix + "/agg_critval_event/")
-
   }
