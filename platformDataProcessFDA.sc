@@ -158,11 +158,11 @@ object Loaders {
     val fdas = fdasFiltered
       .join(drugList, Seq("drug_name"), "inner")
       .withColumn("uniq_report_ids_by_reaction",
-        countDistinct(col("safetyreportid")).over(wAdverses))
+        approx_count_distinct(col("safetyreportid")).over(wAdverses))
       .withColumn("uniq_report_ids_by_drug",
-        countDistinct(col("safetyreportid")).over(wDrugs))
+        approx_count_distinct(col("safetyreportid")).over(wDrugs))
       .withColumn("uniq_report_ids",
-        countDistinct(col("safetyreportid")).over(wAdverseDrugComb))
+        approx_count_distinct(col("safetyreportid")).over(wAdverseDrugComb))
       .select(
         "safetyreportid",
         "chembl_id",
@@ -171,7 +171,6 @@ object Loaders {
         "uniq_report_ids_by_drug",
         "uniq_report_ids"
       )
-      .persist()
 
     // total unique report ids
     val uniqReports = fdas.select("safetyreportid").distinct.count
@@ -190,6 +189,7 @@ object Loaders {
       .withColumn("acterm", ($"A" + $"C") * (log($"A" + $"C") - log($"A" + $"B" + $"C" + $"D")))
       .withColumn("llr", $"aterm" + $"cterm" - $"acterm")
       .distinct()
+      .where($"llr".isNotNull and !$"llr".isNaN)
 
     // write the two datasets on disk as json-lines
     doubleAgg.write.json(outputPathPrefix + "/agg_by_chembl/")
