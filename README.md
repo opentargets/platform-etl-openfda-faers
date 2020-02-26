@@ -77,7 +77,19 @@ exit 0
 
 ### Montecarlo implementation for the critical value
 
-Here the gist link to the **R** implementation `https://gist.github.com/mkarmona/101f6f5ce3befe0996966711e847f5f0`
+Using the output of the previous run as input for this one as follows
+
+```sh
+export JAVA_OPTS="-Xms512m -Xmx<mostofthememingigslike100G>"
+# to compute the dataset
+time amm platformDataProcessFDAMonteCarlo.sc \
+    --inputPath /data/jsonl/ \
+    --outputPathPrefix /data/out \
+    --permutations 1000 \
+    --percentile 0.95
+```
+
+Former gist link to the **R** implementation `https://gist.github.com/mkarmona/101f6f5ce3befe0996966711e847f5f0`
 
 # Copyright
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
