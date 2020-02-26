@@ -25,6 +25,7 @@ object MathHelpers {
     *
     * @link https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Multinom.html
     *      Here the implementation reference
+   *      and here https://github.com/wch/r-source/blob/f8d4d7d48051860cc695b99db9be9cf439aee743/src/nmath/rmultinom.c
     */
   def rmultinom(n: Int, size: Int, probV: BDV[Double]): BDM[Double] = {
     require(probV.size > 0 && size > 0, "the probability vector must be > 0 and the size > 0")
@@ -39,10 +40,11 @@ object MathHelpers {
 
       for (j <- 1 until p.size) {
         val P = p(j) / (1D - breeze.linalg.sum(p(0 until j)))
-        val N = math.abs(size - breeze.linalg.sum(X(0 until j, i))).toInt
+        val N = (size - breeze.linalg.sum(X(0 until j, i))).toInt
 
         val Binj = N match {
           case 0 => 0
+          case n if n < 0 => 0
           case _ => breeze.stats.distributions.Binomial(N, P).sample
         }
 
