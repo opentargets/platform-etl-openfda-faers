@@ -132,10 +132,19 @@ object Loaders {
       .select("chembl_id", "critVal_drug")
       .persist(StorageLevel.DISK_ONLY)
 
+    val exprs = List(
+      "chembl_id",
+      "reaction_reactionmeddrapt as event",
+      "uniq_report_ids_by_reaction as report_count",
+      "llr",
+      "critVal_drug as critval"
+    )
+
     fdas
       .join(critValDrug, Seq("chembl_id"), "inner")
       .where(($"llr" > $"critVal_drug") and
         ($"ciritVal_drug" > 0))
+      .selectExpr(exprs:_*)
       .write
       .json(outputPathPrefix + "/agg_critval_drug/")
   }
