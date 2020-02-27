@@ -135,7 +135,7 @@ object Loaders {
     fdas
       .join(critValDrug, Seq("chembl_id"), "inner")
       .where(($"llr" > $"critVal_drug") and
-        ($"ciritVal_drug > 0"))
+        ($"ciritVal_drug" > 0))
       .write
       .json(outputPathPrefix + "/agg_critval_drug/")
   }
