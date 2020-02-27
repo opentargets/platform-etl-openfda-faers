@@ -147,4 +147,12 @@ object Loaders {
       .selectExpr(exprs:_*)
       .write
       .json(outputPathPrefix + "/agg_critval_drug/")
+
+    // write to one single compressed file
+    ss.read.json(outputPathPrefix + "/agg_critval_drug/")
+      .coalesce(1)
+      .write
+      .option("compression", "gzip")
+      .option("header", "true")
+      .csv(outputPathPrefix + s"/agg_critval_drug_csv/")
   }
