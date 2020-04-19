@@ -237,16 +237,18 @@ object Loaders {
       "critVal_drug as critval"
     )
 
-    fdas
+    val filteredDF = fdas
       .join(critValDrug, Seq("chembl_id"), "inner")
       .where(($"llr" > $"critVal_drug") and
         ($"critVal_drug" > 0))
       .selectExpr(exprs:_*)
-      .write
+      .persist(StorageLevel.DISK_ONLY)
+
+    filteredDF.write
       .json(outputPathPrefix + "/agg_critval_drug/")
 
     // write to one single compressed file
-    ss.read.json(outputPathPrefix + "/agg_critval_drug/")
+    filteredDF
       .coalesce(1)
       .write
       .option("compression", "gzip")
