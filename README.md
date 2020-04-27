@@ -7,6 +7,7 @@ The openFDA drug adverse event API returns data that has been collected from the
 ### Summary
 
 1. openFDA FAERS data [download](https://open.fda.gov/apis/drug/event/download/) (~ 900 files)
+   More info [here](#Produce-the-raw-json-from-scratch)
  
 2. Pre-processing of this data using [platformDataProcessFDA.sc](https://github.com/opentargets/platform-etl-openfda-faers/blob/master/platformDataProcessFDA.sc) scala script:
   - Filtering:
@@ -50,7 +51,7 @@ elasticdump --input=http://localhost:9200/19.06_drug-data \
     --sourceOnly
 ```
 
-### Produce the raw json from scratch
+### Produce the raw json from scratch ()
 
 In the case you may want to generate all data again even the raw data this is the
 piece of bash scripts I used to produce it
@@ -74,6 +75,35 @@ done
 wait
 exit 0
 ```
+
+# Using AWS command
+```
+pip install aws
+```
+
+Script for using AWS storage
+
+
+```bash
+curl -XGET 'https://api.fda.gov/download.json' | \
+    cat - | \
+    jq -r '.results.drug.event.partitions[].file' > files.txt
+
+sed  's?https://download.open.fda.gov/?sudo aws s3 cp  s3://download.open.fda.gov/?' files.txt | sed 's?json.zip?json.zip `uuidgen -r`.json.zip --no-sign-request?' > go.sh
+
+```
+
+Run "go.sh" in the directory that you want to use and after unzip the files.
+
+This is an example of the single command generated.
+```
+sudo aws s3 cp  s3://download.open.fda.gov/drug/event/2005q3/drug-event-0004-of-0005.json.zip `uuidgen -r`.json.zip --no-sign-request
+````
+
+
+
+
+
 
 ### Montecarlo implementation for the critical value
 
