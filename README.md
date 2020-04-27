@@ -7,7 +7,7 @@ The openFDA drug adverse event API returns data that has been collected from the
 ### Summary
 
 1. openFDA FAERS data [download](https://open.fda.gov/apis/drug/event/download/) (~ 900 files)
-  - [Click here from more details] for creating from scrath the data(#Produce-the-raw-json-from-scratch)
+  - [Click here from more details](#Produce-the-raw-json-from-scratch) for creating from scrath the data
  
 2. Pre-processing of this data using [platformDataProcessFDA.sc](https://github.com/opentargets/platform-etl-openfda-faers/blob/master/platformDataProcessFDA.sc) scala script:
   - Filtering:
