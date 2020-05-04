@@ -232,7 +232,7 @@ object Loaders {
     val exprs = List(
       "chembl_id",
       "reaction_reactionmeddrapt as event",
-      "uniq_report_ids as report_count",
+      "A as report_count",
       "llr",
       "critVal_drug as critval"
     )
