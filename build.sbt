@@ -54,8 +54,7 @@ lazy val dependencies = Seq(
   "org.apache.spark" %% "spark-core" % sparkVer,
   "org.apache.spark" %% "spark-sql" % sparkVer,
   "org.scalactic" %% "scalactic" % scalaTestVer,
-  "org.scalatest" %% "scalatest" % scalaTestVer % "test",
-  "com.holdenkarau" %% "spark-testing-base" % "2.4.5_0.14.0" % "test"
+  "org.scalatest" %% "scalatest" % scalaTestVer % "test"
 )
 
 

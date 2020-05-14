@@ -3,11 +3,13 @@ package io.opentargets.openfda
 import java.io.File
 
 import com.typesafe.scalalogging.LazyLogging
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
 import scopt.OptionParser
 
 object OpenFdaEtl extends LazyLogging {
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
     parser.parse(args, Config()) match {
       case Some(c) => {
         logger.info(
@@ -18,6 +20,16 @@ object OpenFdaEtl extends LazyLogging {
              |""".stripMargin)
 
         // set up spark context
+        val sparkConf = new SparkConf()
+          .set("spark.driver.maxResultSize", "0")
+          .setAppName("similarities-loaders")
+          .setMaster("local[*]")
+
+        implicit val ss = SparkSession.builder
+          .config(sparkConf)
+          .getOrCreate
+
+        import ss.implicits._
 
         // load inputs
 
@@ -28,7 +40,7 @@ object OpenFdaEtl extends LazyLogging {
 
   }
 
-  val parser = new OptionParser[Config]("openFdaEtl") {
+  val parser: OptionParser[Config] = new OptionParser[Config]("openFdaEtl") {
     head("OpenFda Etl pipeline", "0.1")
 
     opt[File]("drugSetPath").required
