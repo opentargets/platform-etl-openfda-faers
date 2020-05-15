@@ -15,7 +15,7 @@ lazy val root = (project in file("."))
     coverageHighlighting := true,
     libraryDependencies ++= dependencies,
     // Assembly plugin configuration for fat jar
-    mainClass in assembly := Some(s"$organization.$name.Main"),
+    mainClass in assembly := Some(s"$organization.$name.OpenFdaEtl"),
     assemblyJarName in assembly := s"${name.value}.jar",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
     assemblyMergeStrategy in assembly := {
@@ -50,11 +50,11 @@ val sparkVer = "2.4.5"
 val scalaTestVer = "3.1.1"
 lazy val dependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+  "org.scalanlp" %% "breeze" % "1.0",
+  "org.scalanlp" %% "breeze-natives" % "1.0",
   "com.github.scopt" %% "scopt" % "4.0.0-RC1",
   "org.apache.spark" %% "spark-core" % sparkVer,
   "org.apache.spark" %% "spark-sql" % sparkVer,
   "org.scalactic" %% "scalactic" % scalaTestVer,
   "org.scalatest" %% "scalatest" % scalaTestVer % "test"
 )
-
-

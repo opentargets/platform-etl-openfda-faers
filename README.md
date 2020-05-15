@@ -30,6 +30,8 @@ The openFDA drug adverse event API returns data that has been collected from the
 
 ### Run the scala script
 
+#### Ammonite
+
 ```sh
 export JAVA_OPTS="-Xms512m -Xmx<mostofthememingigslike100G>"
 # to compute the dataset
@@ -38,7 +40,14 @@ time amm platformDataProcessFDA.sc \
     --inputPathPrefix "/data/eirini/raw/**/*.jsonl" \
     --outputPathPrefix /data/eirini/out
 ```
+#### Spark-submit
 
+```shell script
+/usr/lib/spark/bin/spark-submit --class ... \
+--driver-memory $(free -g | awk '{print $7}')g \
+--master local[*] \
+<jar> --arg1 ... --arg2 ...
+```
 ### Generate the drug dump from ES7
 
 You will need to either connect to a machine containing the ES or forward the ssh port from it
