@@ -35,7 +35,6 @@ object MonteCarloSampling {
                                 $"uniq_report_ids_by_drug",
                                 $"n_i",
                                 $"uniq_reports_total",
-                                $"uniq_report_ids",
                                 lit(percentile)))
       .select("chembl_id", "critVal_drug")
 
