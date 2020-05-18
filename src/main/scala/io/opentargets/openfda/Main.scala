@@ -11,6 +11,9 @@ import scopt.OptionParser
 
 object Main extends LazyLogging {
 
+  val PERMUTATIONS = 100
+  val PERCENTILE = 0.95
+
   def main(args: Array[String]): Unit = {
     parser.parse(args, Config()) match {
       case Some(c) =>
@@ -18,6 +21,9 @@ object Main extends LazyLogging {
                        |ChEMBL database: ${c.chemblJson}
                        |FDA database: ${c.fdaPath}
                        |Output: ${c.outputPath}
+                       |Blacklist: ${c.blacklist}
+                       |Percentile: ${c.percentile}
+                       |Permutations: ${c.permutations}
                        |""".stripMargin)
 
         // set up spark context
@@ -32,17 +38,23 @@ object Main extends LazyLogging {
           .getOrCreate
 
         logger.info("Beginning pipeline...")
+
+        logger.info("Aggregating FDA data...")
         val doubleAgg: DataFrame = OpenFdaEtl.run(c)
         ResultWriters.writeFdaResults(doubleAgg, c)
 
-        val monteCarloResults = MonteCarloSampling.run(doubleAgg)
+        logger.info("Performing Monte Carlo sampling...")
+        val monteCarloResults = MonteCarloSampling.run(doubleAgg, c.percentile, c.permutations)
         ResultWriters.writeMonteCarloResults(monteCarloResults, c.outputPath.getAbsolutePath)
+
+        logger.info("Pipeline complete.")
 
       case _ => sys.exit(1)
     }
 
   }
 
+  // Cli input validation
   val parser: OptionParser[Config] = new OptionParser[Config]("openFdaEtl") {
     head("OpenFda Etl pipeline", "0.1")
     import CliValidators._
@@ -77,12 +89,31 @@ object Main extends LazyLogging {
       .validate(isA(_, "txt"))
       .text("Blacklist of excluded events")
 
+    opt[Int]("permutations")
+      .required()
+      .validate(x =>
+        if (x > 0) success
+        else failure("Permutations must be greater than 0"))
+      .withFallback(() => PERMUTATIONS)
+      .action((x, c) => c.copy(permutations = x))
+      .text("Number of permutations in MC sampling")
+
+    opt[Double]("percentile")
+      .required()
+      .validate(x =>
+        if (x > 0 && x < 1) success
+        else failure("Percentile must be between 0 and 1"))
+      .withFallback(() => PERCENTILE)
+      .action((x, c) => c.copy(percentile = x))
+      .text("Number of permutations in MC sampling")
   }
   // todo: add optional configuration for MC
   case class Config(chemblJson: File = new File(""),
                     fdaPath: File = new File(""),
                     outputPath: File = new File(""),
-                    blacklist: File = new File(""))
+                    blacklist: File = new File(""),
+                    permutations: Int = PERMUTATIONS,
+                    percentile: Double = PERCENTILE)
 
 }
 
@@ -119,6 +150,7 @@ object CliValidators {
 }
 
 object ResultWriters extends LazyLogging {
+
   def writeMonteCarloResults(results: DataFrame, outputPath: String): Unit = {
     logger.info("Writing results of monte carlo sampling...")
     results.write

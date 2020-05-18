@@ -7,6 +7,9 @@ import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+/**
+  * Extract key information from the FDA dataset.
+  */
 object OpenFdaEtl extends LazyLogging {
 
   def run(config: Config)(implicit ss: SparkSession): DataFrame = {
@@ -102,6 +105,21 @@ object OpenFdaEtl extends LazyLogging {
     val uniqReports = fdas.select("safetyreportid").distinct.count
 
     // compute llr and its needed terms as per drug-reaction pair
+    /*
+    root
+    | chembl_id
+    | reaction_reactionmedrapt
+    | uniq_report_ids_by_reaction
+    | uniq_report_ids_by_drug
+    | A
+    | B
+    | C
+    | D
+    | aterm
+    | bterm
+    | acterm
+    | llr
+     */
     val doubleAgg = fdas
       .drop("safetyreportid")
       .withColumnRenamed("uniq_report_ids", "A")
