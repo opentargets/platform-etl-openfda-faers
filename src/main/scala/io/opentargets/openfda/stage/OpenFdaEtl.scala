@@ -1,7 +1,7 @@
 package io.opentargets.openfda.stage
 
 import com.typesafe.scalalogging.LazyLogging
-import io.opentargets.openfda.Main.Config
+import io.opentargets.openfda.config.ETLSessionContext
 import io.opentargets.openfda.utils.Loaders
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
@@ -12,7 +12,12 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
   */
 object OpenFdaEtl extends LazyLogging {
 
-  def run(config: Config)(implicit ss: SparkSession): DataFrame = {
+  def apply(implicit etLSessionContext: ETLSessionContext): DataFrame = {
+    implicit val ss: SparkSession = etLSessionContext.sparkSession
+
+    val blackListPath = etLSessionContext.configuration.common.inputs.blacklist.path
+    val chemblPath = etLSessionContext.configuration.common.inputs.chemblData.path
+    val fdaPath = etLSessionContext.configuration.common.inputs.fdaData.path
 
     import ss.implicits._
 
@@ -20,18 +25,18 @@ object OpenFdaEtl extends LazyLogging {
     /* load the blacklist terms collect as a list and broadcast the field to
         all the cluster nodes thus it can be effectively used per row
      */
-    val bl = broadcast(Loaders.loadBlackList(config.blacklist.getAbsolutePath))
+    val bl = broadcast(Loaders.loadBlackList(blackListPath))
 
     // the curated drug list we want
-    val targetList = Loaders.loadTargetListFromChemblDrugs(config.chemblJson.getAbsolutePath)
+    val targetList = Loaders.loadTargetListFromChemblDrugs(chemblPath)
     val drugList = Loaders
-      .loadChemblDrugList(config.chemblJson.getAbsolutePath)
+      .loadChemblDrugList(chemblPath)
       .join(targetList, Seq("chembl_id"), "left")
       .orderBy(col("drug_name"))
       .cache()
 
     // load FDA raw lines
-    val lines = Loaders.loadFDA(config.fdaPath.getAbsolutePath)
+    val lines = Loaders.loadFDA(fdaPath)
     val fdasF = lines
       .withColumn("reaction", explode(col("patient.reaction")))
       // after explode this we will have reaction-drug pairs

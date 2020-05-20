@@ -100,6 +100,8 @@ time amm platformDataProcessFDAMonteCarlo.sc \
 
 Former gist link to the **R** implementation `https://gist.github.com/mkarmona/101f6f5ce3befe0996966711e847f5f0`
 
+time /usr/lib/spark/bin/spark-submit --class "io.opentargets.openfda.Main" --driver-memory 300g --master local[*] /home/jarrod/platform-etl-openfda-faers/target/scala-2.12/openFda.jar --chemblData "/data/jsonl/20.04_drug-data.json" --fdaData /home/jarrod/fdaDataIn/ --outputPath /home/jarrod/outArea/ --blacklist /home/jarrod/blacklisted_events.txt
+
 # Copyright
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
 

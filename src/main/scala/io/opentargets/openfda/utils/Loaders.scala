@@ -71,6 +71,4 @@ object Loaders extends LazyLogging {
       .orderBy(col("reactions").asc)
   }
 
-  def loadAggFDA(path: String)(implicit ss: SparkSession): DataFrame = ss.read.json(path)
-
 }
