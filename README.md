@@ -27,10 +27,9 @@ This project should be run as a Spark job to generate aggregate outputs of adver
 1. OpenJDK 1.8
 2. scala 2.12.x (through SDKMAN is simple)
 3. ammonite REPL
-4. [Drug index dump from OpenTargets ES](#generate-the-drug-dump-from-es7)
+4. [Drug index dump from OpenTargets ES](#generate-the-indices-dump-from-es7)
 5. [OpenFDA FAERS DB](#produce-the-raw-json-from-scratch)
 6. Text file of [blacklisted events](#blacklist)
-
 
 ### Create a fat JAR
 Simply run the following command:
@@ -43,7 +42,7 @@ The jar will be generated under _target/scala-2.12.10/_
 ### Configuration
 
 The base configuration is found under `src/main/resources/reference.conf`. If you want to use specific configurations
-for a Spark job see [below](load-with-custom-configuration). 
+for a Spark job see [below](#load-with-custom-configuration). 
 
 The `fda` section is specifically relevant to this pipeline. 
 
