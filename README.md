@@ -4,11 +4,13 @@ OpenTargets ETL pipeline to process OpenFDA FAERS DB.
 
 The openFDA drug adverse event API returns data that has been collected from the FDA Adverse Event Reporting System (FAERS), a database that contains information on adverse event and medication error reports submitted to FDA.
 
+This project should be run as a Spark job to generate aggregate outputs of adverse drug events.
+
 ### Summary
 
 1. Download the OpenFDA "FAERS" [data](https://open.fda.gov/apis/drug/event/download/) (~ 1000 files - May 2020)
  
-2. Pre-processing of this data using [platformDataProcessFDA.sc](https://github.com/opentargets/platform-etl-openfda-faers/blob/master/platformDataProcessFDA.sc) scala script:
+2. __Stage 1:__ Pre-processing of this data (OpenFdaEtl.scala):
      - Filtering:
         - Only reports submitted by health professionals (*primarysource.qualification* in (1,2,3)).
         - Exclude reports that resulted in death (no entries with *seriousnessdeath*=1).  
@@ -18,7 +20,7 @@ The openFDA drug adverse event API returns data that has been collected from the
         - Open Targets drug index fields:  *‘chembl_id’, ‘synonyms’, ‘pref_name’, ‘trade_names’*.
         - openFDA adverse event data fields: *‘drug.medicinalproduct’, ‘drug.openfda.generic_name’, ‘drug.openfda.brand_name’, ‘drug.openfda.substance_name’*.
     - Generate table where each row is a unique drug-event pair and count the number of report IDs for each pair, the total number of reports, the total number of reports per drug and the total number of reports per event. Using these calculate the fields required for estimating the significance of each event occuring for each drug, e.g. log-likelihood ratio, (llr) (based on [FDA LRT method](https://openfda.shinyapps.io/LRTest/_w_c5c2d04d/lrtmethod.pdf)).
-3. Calculate significance of each event for all drugs based on the FDA LRT method (Monte Carlo simulation) using the [openFDA_MonteCarlo_drugs.R](https://github.com/opentargets/platform-etl-openfda-faers/blob/master/R/openFDA_MonteCarlo_drugs.R) script. 
+3. __Stage 2:__ Calculate significance of each event for all drugs based on the FDA LRT method (Monte Carlo simulation) (MonteCarloSampling.scala). 
 
 ### Requirements
 
@@ -27,50 +29,150 @@ The openFDA drug adverse event API returns data that has been collected from the
 3. ammonite REPL
 4. [Drug index dump from OpenTargets ES](#generate-the-drug-dump-from-es7)
 5. [OpenFDA FAERS DB](#produce-the-raw-json-from-scratch)
+6. Text file of [blacklisted events](#blacklist)
 
-### Run the scala script
 
-#### Ammonite
+### Create a fat JAR
+Simply run the following command:
 
-The script can be executed with the following command: 
+```bash
+sbt assembly
+```
+The jar will be generated under _target/scala-2.12.10/_
+
+### Configuration
+
+The base configuration is found under `src/main/resources/reference.conf`. If you want to use specific configurations
+for a Spark job see [below](load-with-custom-configuration). 
+
+The `fda` section is specifically relevant to this pipeline. 
+
+#### Montecarlo
+
+Specify the number of permutations and the relevance percentile threshhold.
+
+#### Fda Inputs
+
+Paths to the blacklisted_events, chembl data and fda database dump. 
+
+#### Outputs
+
+Specify format in which output should be saved. If no outputs are specified the 
+results will not be saved. 
+
+Output can be either "csv" or "json".
+
+### Running
+
+#### Dataproc
+
+##### Create cluster and launch
+
+Here how to create a cluster using `gcloud` tool
 
 ```sh
-export JAVA_OPTS="-Xms512m -Xmx<mostofthememingigslike100G>"
-# to compute the dataset
-time amm platformDataProcessFDA.sc \
-    --drugSetPath "/data/jsonl/19.06_drug-data.json" \
-    --inputPathPrefix "/data/eirini/raw/**/*.jsonl" \
-    --outputPathPrefix /data/eirini/out \
-    --blackListPath /<path>/blacklisted_events.txt
+gcloud beta dataproc clusters create \
+    etl-cluster \
+    --image-version=1.5-debian10 \
+    --properties=yarn:yarn.nodemanager.vmem-check-enabled=false,spark:spark.debug.maxToStringFields=1024,spark:spark.master=yarn \
+    --master-machine-type=n1-highmem-16 \
+    --master-boot-disk-size=500 \
+    --num-secondary-workers=0 \
+    --worker-machine-type=n1-standard-16 \
+    --num-workers=2 \
+    --worker-boot-disk-size=500 \
+    --zone=europe-west1-d \
+    --project=open-targets-eu-dev \
+    --region=europe-west1 \
+    --initialization-action-timeout=20m \
+    --max-idle=30m
+```
+
+##### Submitting a job to existing cluster
+
+And to submit the job with either a local jar or from a GCS Bucket (gs://...)
+
+```sh
+gcloud dataproc jobs submit spark \
+           --cluster=etl-cluster \
+           --project=open-targets-eu-dev \
+           --region=europe-west1 \
+           --async \
+           --jar=gs://ot-snapshots/...
+```
+
+#### Load with custom configuration
+
+Add to your run either commandline or sbt task Intellij IDEA `-Dconfig.file=application.conf` and it
+will load the configuration from your `./` path or project root. Missing fields will be resolved
+with `reference.conf`.
+
+The same happens with logback configuration. You can add `-Dlogback.configurationFile=application.xml` and
+have a logback.xml hanging on your project root or run path. An example log configuration
+file
+
+```xml
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%level %logger{15} - %message%n%xException{10}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <logger name="io.opentargets.openfda" level="DEBUG"/>
+    <logger name="org.apache.spark" level="WARN"/>
+
+</configuration>
+```
+If you are using the Dataproc cluster you need to add some additional arguments specifying
+where the configuration can be found. 
+
+```sh
+gcloud dataproc jobs submit spark \
+           --cluster=etl-cluster \
+           --project=open-targets-eu-dev \
+           --region=europe-west1 \
+           --async \
+           --files=application.conf \
+           --properties=spark.executor.extraJavaOptions=-Dconfig.file=job.conf,spark.driver.extraJavaOptions=-Dconfig.file=application.conf \
+           --jar=gs://ot-snapshots/...
+```
+where `application.conf` is a subset of `reference.conf`
+
+```hocon
+common {
+  output = "gs://ot-snapshots/etl/mk-latest"
+}
 ```
 
 #### Spark-submit
 
+The fat jar can be executed on a local installation of Spark using `spark-submit`:
+
 ```shell script
-/usr/lib/spark/bin/spark-submit --class ... \
+/usr/lib/spark/bin/spark-submit --class io.opentargets.openfda.Main \
 --driver-memory $(free -g | awk '{print $7}')g \
 --master local[*] \
 <jar> --arg1 ... --arg2 ...
 ```
-### Generate the drug dump from ES7
 
-The script requires four parameters to be provided
 
-- `drugSetPath` is the path to ChEMBL drug data
-- `inputPathPrefix` is the path to the FDA Json files. See [generating FDA json](#produce-the-raw-json-from-scratch) if you do not have these files already prepared.
-- `outputPathPrefix` specifies the output directory to save the results. A Json file called `agg_by_chembl` will be created in the specified directory with the results.
-- `blackListPath` is a list of FDA events to remove. See [blacklist](#blacklist)
 
 ### Obtaining data inputs
 
 The following sections outline how to obtain the necessary input files for the `platformDataProcessFDA.sc ` script.
-#### Generate the drug dump from ES7
 
+### Generate the indices dump from ES7
 
 You will need to either connect to a machine containing the ES or forward the ssh port from it
 ```sh
-elasticdump --input=http://localhost:9200/19.06_drug-data \
-    --output=19.06_drug-data.json \
+elasticdump --input=http://localhost:9200/<indexyouneed> \
+    --output=<indexyouneed>.json \
     --type=data  \
     --limit 10000 \
     --sourceOnly
@@ -98,42 +200,6 @@ done
 # wait for all processes to finish
 wait
 exit 0
-```
-
-### Montecarlo implementation for the critical value
-
-Using the output of `platformDataProcessFDA.sc` as the input to the `platformDataProcessFDAMonteCarlo.sc` script.
-
-```sh
-export JAVA_OPTS="-Xms512m -Xmx<mostofthememingigslike100G>"
-# to compute the dataset
-time amm platformDataProcessFDAMonteCarlo.sc \
-    --inputPath /data/jsonl/ \
-    --outputPathPrefix /data/out \
-    --permutations 1000 \
-    --percentile 0.95
-```
-The script requires the following inputs:
-
-- `inputPath` directory containing the input data generated [above](#run-the-scala-script)
-- `outputPathPrefix` directory in which to write the two output files:
-    - `agg_critval_drug`
-    - `agg_critval_drug_csv`
-- `permutations` - Optional, default is 100
-- `percentiles` - Optional, default is 0.99
-
-Former gist link to the **R** implementation `https://gist.github.com/mkarmona/101f6f5ce3befe0996966711e847f5f0`
-
-```sh
-time /usr/lib/spark/bin/spark-submit \
---class "io.opentargets.openfda.Main" \
---driver-memory 300g \
---master local[*] /home/jarrod/platform-etl-openfda-faers/target/scala-2.12/openFda.jar \
---chemblData "/data/jsonl/20.04_drug-data.json" \
---fdaData /home/jarrod/fdaDataIn/ \
---outputPath /home/jarrod/outArea/ \
---blacklist /home/jarrod/blacklisted_events.txt
-
 ```
 
 #### Blacklist
