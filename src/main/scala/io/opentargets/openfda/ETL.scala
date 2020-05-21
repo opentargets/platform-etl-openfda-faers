@@ -23,7 +23,7 @@ object ETL extends LazyLogging {
                                                       fdaConfig.montecarlo.permutations)
 
         // write results if necessary
-        logger.info("Writing results of FDA pipeline")
+        logger.info("Writing results of FDA pipeline...")
         Writers.writeFdaResults(openFdaDataAggByChembl, context.configuration.common.output)
 
         if (fdaConfig.outputs.nonEmpty) {

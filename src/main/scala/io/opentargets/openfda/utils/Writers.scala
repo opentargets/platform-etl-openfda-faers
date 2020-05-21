@@ -6,11 +6,11 @@ import org.apache.spark.sql.DataFrame
 object Writers extends LazyLogging {
 
   def writeMonteCarloResults(results: DataFrame, outputPath: String, extension: String): Unit = {
-    logger.info("Writing results of monte carlo sampling...")
+
     extension match {
       case "csv" =>
         // write to one single compressed file
-        logger.info("Writing csv compressed output...")
+        logger.info("Writing monte carlo results as csv compressed output...")
         results
           .coalesce(1)
           .write
@@ -19,7 +19,7 @@ object Writers extends LazyLogging {
           .csv(s"$outputPath/agg_critval_drug_csv/")
 
       case "json" =>
-        logger.info("Writing json output...")
+        logger.info("Writing monte carlo results as json output...")
         results.write
           .json(s"$outputPath/agg_critval_drug/")
 
@@ -29,7 +29,7 @@ object Writers extends LazyLogging {
   }
 
   def writeFdaResults(results: DataFrame, outputPath: String): Unit = {
-    logger.info("Writing results of fda data transformation...")
+    logger.info("Writing results of fda data transformation aggregated by Chembl...")
     results.write.json(s"$outputPath/agg_by_chembl/")
   }
 }

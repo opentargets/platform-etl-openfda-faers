@@ -7,7 +7,8 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 
 class ConfigurationTest extends AnyFlatSpecLike with Matchers {
   "Pureconfig" should "successfully load standard configuration" in {
-    assert(Configuration.config != null)
+    val conf = Configuration.config
+    assert(conf != null)
   }
 }
 
