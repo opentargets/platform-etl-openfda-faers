@@ -6,7 +6,7 @@ import pureconfig.ConfigSource
 import pureconfig.generic.auto._
 
 case class OTConfig(sparkUri: Option[String], common: Common, fda: Fda)
-case class Common(defaultSteps: Seq[String], output: String, outputFormat: String)
+case class Common(defaultSteps: Seq[String], output: String)
 case class FdaInputs(
     blacklist: String,
     chemblData: String,
@@ -20,7 +20,7 @@ case class MonteCarlo(permutations: Int, percentile: Double) {
   require(permutations > 0)
   require(percentile > 0 && percentile < 1)
 }
-case class Fda(montecarlo: MonteCarlo, inputs: FdaInputs, outputs: Seq[String]) {
+case class Fda(montecarlo: MonteCarlo, fdaInputs: FdaInputs, outputs: Seq[String]) {
   private def validOutput(str: String): Boolean = List("csv", "json", "jsonl").contains(str)
   require(outputs.forall(validOutput))
 }

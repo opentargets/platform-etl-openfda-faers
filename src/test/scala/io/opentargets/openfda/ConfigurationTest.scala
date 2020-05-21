@@ -1,9 +1,15 @@
 package io.opentargets.openfda
 
-import io.opentargets.openfda.config.{Fda, FdaInputs, MonteCarlo}
+import io.opentargets.openfda.config.{Configuration, Fda, FdaInputs, MonteCarlo}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+
+class ConfigurationTest extends AnyFlatSpecLike with Matchers {
+  "Pureconfig" should "successfully load standard configuration" in {
+    assert(Configuration.config != null)
+  }
+}
 
 class FdaConfigurationTest extends AnyFlatSpecLike with Matchers {
 
