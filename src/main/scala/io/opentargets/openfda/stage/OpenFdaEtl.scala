@@ -15,9 +15,9 @@ object OpenFdaEtl extends LazyLogging {
   def apply(implicit etLSessionContext: ETLSessionContext): DataFrame = {
     implicit val ss: SparkSession = etLSessionContext.sparkSession
 
-    val blackListPath = etLSessionContext.configuration.common.inputs.blacklist.path
-    val chemblPath = etLSessionContext.configuration.common.inputs.chemblData.path
-    val fdaPath = etLSessionContext.configuration.common.inputs.fdaData.path
+    val blackListPath = etLSessionContext.configuration.fda.inputs.blacklist
+    val chemblPath = etLSessionContext.configuration.fda.inputs.chemblData
+    val fdaPath = etLSessionContext.configuration.fda.inputs.fdaData
 
     import ss.implicits._
 

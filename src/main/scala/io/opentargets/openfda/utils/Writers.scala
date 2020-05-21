@@ -5,18 +5,27 @@ import org.apache.spark.sql.DataFrame
 
 object Writers extends LazyLogging {
 
-  def writeMonteCarloResults(results: DataFrame, outputPath: String): Unit = {
+  def writeMonteCarloResults(results: DataFrame, outputPath: String, extension: String): Unit = {
     logger.info("Writing results of monte carlo sampling...")
-    results.write
-      .json(s"$outputPath/agg_critval_drug/")
+    extension match {
+      case "csv" =>
+        // write to one single compressed file
+        logger.info("Writing csv compressed output...")
+        results
+          .coalesce(1)
+          .write
+          .option("compression", "gzip")
+          .option("header", "true")
+          .csv(s"$outputPath/agg_critval_drug_csv/")
 
-    // write to one single compressed file
-    results
-      .coalesce(1)
-      .write
-      .option("compression", "gzip")
-      .option("header", "true")
-      .csv(s"$outputPath/agg_critval_drug_csv/")
+      case "json" =>
+        logger.info("Writing json output...")
+        results.write
+          .json(s"$outputPath/agg_critval_drug/")
+
+      case err: String => logger.error(s"Unrecognised output format $err")
+    }
+
   }
 
   def writeFdaResults(results: DataFrame, outputPath: String): Unit = {

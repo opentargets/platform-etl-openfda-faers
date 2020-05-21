@@ -5,17 +5,24 @@ import com.typesafe.scalalogging.LazyLogging
 import pureconfig.ConfigSource
 import pureconfig.generic.auto._
 
-case class OTConfig(sparkUri: Option[String], common: Common, montecarlo: MonteCarlo)
-case class Common(defaultSteps: Seq[String], inputs: Inputs, output: String, outputFormat: String)
-case class Inputs(
-    blacklist: InputInfo,
-    chemblData: InputInfo,
-    fdaData: InputInfo
-)
-case class InputInfo(format: String, path: String)
+case class OTConfig(sparkUri: Option[String], common: Common, fda: Fda)
+case class Common(defaultSteps: Seq[String], output: String, outputFormat: String)
+case class FdaInputs(
+    blacklist: String,
+    chemblData: String,
+    fdaData: String
+) {
+  require(blacklist.endsWith("txt"))
+  require(chemblData.endsWith("json"))
+  require(fdaData.endsWith("jsonl"))
+}
 case class MonteCarlo(permutations: Int, percentile: Double) {
   require(permutations > 0)
   require(percentile > 0 && percentile < 1)
+}
+case class Fda(montecarlo: MonteCarlo, inputs: FdaInputs, outputs: Seq[String]) {
+  private def validOutput(str: String): Boolean = List("csv", "json", "jsonl").contains(str)
+  require(outputs.forall(validOutput))
 }
 object Configuration extends LazyLogging {
   lazy val config: OTConfig = load

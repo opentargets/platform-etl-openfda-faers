@@ -13,18 +13,26 @@ object ETL extends LazyLogging {
     step match {
       case "fda" =>
         logger.info("run step fda pipeline...")
-
+        val fdaConfig = context.configuration.fda
         logger.info("Aggregating FDA data...")
         val openFdaDataAggByChembl: DataFrame = OpenFdaEtl.apply
 
         logger.info("Performing Monte Carlo sampling...")
         val mcResults: DataFrame = MonteCarloSampling(openFdaDataAggByChembl,
-                                                      context.configuration.montecarlo.percentile,
-                                                      context.configuration.montecarlo.permutations)
+                                                      fdaConfig.montecarlo.percentile,
+                                                      fdaConfig.montecarlo.permutations)
 
+        // write results if necessary
         logger.info("Writing results of FDA pipeline")
         Writers.writeFdaResults(openFdaDataAggByChembl, context.configuration.common.output)
-        Writers.writeMonteCarloResults(mcResults, context.configuration.common.output)
+
+        if (fdaConfig.outputs.nonEmpty) {
+          fdaConfig.outputs.foreach { extension =>
+            Writers.writeMonteCarloResults(mcResults,
+                                           context.configuration.common.output,
+                                           extension)
+          }
+        }
 
         logger.info("All FDA stages complete.")
     }
