@@ -55,7 +55,6 @@ object Loaders extends LazyLogging {
   }
 
   /** load a blacklist of events you might want to exclude from the computations */
-  /** load a blacklist of events you might want to exclude from the computations */
   def loadBlackList(path: String)(implicit ss: SparkSession): DataFrame = {
 
     logger.info("Loading event blacklist...")
