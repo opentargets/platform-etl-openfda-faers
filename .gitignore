@@ -1,5 +1,8 @@
 /platform-etl-openfda-faers.iml
 /.idea
+/.metals
+/project/metals.sbt
+/.bloop
 /input
 /out
 /metorikku-standalone.jar
