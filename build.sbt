@@ -17,7 +17,6 @@ lazy val root = (project in file("."))
     // Assembly plugin configuration for fat jar
     mainClass in assembly := Some(s"${organization.value}.${name.value}.Main"),
     assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
     assemblyMergeStrategy in assembly := {
       case PathList("META-INF", "services", "org.apache.hadoop.fs.FileSystem") =>
         MergeStrategy.filterDistinctLines
