@@ -5,12 +5,21 @@ import io.opentargets.openfda.config.ETLSessionContext
 import io.opentargets.openfda.utils.Loaders
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 /**
   * Extract key information from the FDA dataset.
   */
 object OpenFdaEtl extends LazyLogging {
+
+  private def generateDrugList(chemblPath: String)(
+      implicit sparkSession: SparkSession): Dataset[Row] = {
+    val targetList = Loaders.loadTargetListFromChemblDrugs(chemblPath)
+    val chemblList = Loaders.loadChemblDrugList(chemblPath)
+    chemblList
+      .join(targetList, Seq("chembl_id"), "left")
+      .orderBy(col("drug_name"))
+  }
 
   def apply(implicit etLSessionContext: ETLSessionContext): DataFrame = {
     implicit val ss: SparkSession = etLSessionContext.sparkSession
@@ -26,18 +35,13 @@ object OpenFdaEtl extends LazyLogging {
         all the cluster nodes thus it can be effectively used per row
      */
     val bl = broadcast(Loaders.loadBlackList(blackListPath))
-
     // the curated drug list we want
-    val targetList = Loaders.loadTargetListFromChemblDrugs(chemblPath)
-    val drugList = Loaders
-      .loadChemblDrugList(chemblPath)
-      .join(targetList, Seq("chembl_id"), "left")
-      .orderBy(col("drug_name"))
-      .cache()
 
-    // load FDA raw lines
-    val lines = Loaders.loadFDA(fdaPath)
-    val fdasF = lines
+    val adverseEventReports = Loaders.loadFDA(fdaPath)
+
+    val drugList: Dataset[Row] = generateDrugList(chemblPath).cache()
+
+    val fdasF = adverseEventReports
       .withColumn("reaction", explode(col("patient.reaction")))
       // after explode this we will have reaction-drug pairs
       .withColumn("drug", explode(col("patient.drug")))
