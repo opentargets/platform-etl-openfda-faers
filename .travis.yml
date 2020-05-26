@@ -1,24 +1,23 @@
 dist: xenial
 language: scala
 scala:
-  - 2.12.10
+- 2.12.10
 jdk:
-  - openjdk8
+- openjdk8
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean compile
-  - sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
-  - sbt ++$TRAVIS_SCALA_VERSION assembly
+- sbt ++$TRAVIS_SCALA_VERSION clean compile
+- sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+- sbt ++$TRAVIS_SCALA_VERSION assembly
 deploy:
   provider: releases
   api_key:
-    secure: PnaouniMnR2uDeNEFfgYRE/4xoIz+yw8yMf2jfQDkFEatcxCTYQJfXotYySu+tWpzzGLZ6KGv+0SjyXcsw+aRVdHF+edTxaRLHzJjQEvTyOB0W9K2K4G6cOAyK2WGURZhxwgA2pO3TgdMEzdctlz3L64uubCJcMnPpUWUXh8lpoMYSxl5q3zLIBcSD48Au4X7HketL4rHlLWD3dFTHvZcXAH9HE8trsNwkF59HKGYXnxtwN0fxLAQptJHRuvvUqQZvWdRvl1ghSig17egoM2gbKZDOrVySoFSTnPqx6LCYAJfn6fSVKhYoKWHUDQIeDVT1kU+kZUVEgfb+sfsgIxE/ZG8R0B/41KGT5QdGKjbyjh25WDOSHXPJiCb7ZaLYbtsjdqZ0iwBXu2V4epOl1xCHV5k80Mu2eexNtB7gJjoRgQ7lnYtsBJJFxYaZeb6gtCO5utaBE4TLcneFpfJM+ezwQa6Pg1GjPXxBN4XEbWYKZAuY21iipo1H/aqrds0oRtCIVDVemJeCUiliV/yfZfPoLlKsS0hD6Nyva1NAzAVDOqZZCZZfj2M6aq/5mjXhRvP2yFMYNgY7we1Wp99cFX9g1sQ67ql3QdU7xKzEn58/1gRN3iIQ3sP+MpKUWxKfS8UdmrXcuyoFANnbLWEHOyf44bRRQ6zuS98FLeSuVKPCE=
+    secure: GVdAKJUDvyr7EFXLN7bqmECrmLN315/idGeaoO4vxMYspTqszXYxzfNDelBB4/UGLbtpDlkRR6CgXM0wtdLbPoQn45PywPa6E0QWWshavKdriEAUHapveCeH05rgHT9nSaedvHHZIm6AqRbHJtYmSHfyn1rOD+VfByKZa3f3YvYYhbuT+oAYMuq6XD0RY5vjlbYMWX8+kCqvr0KCNAr9gvzX0TYYUVe5QHGjtZUTIK0dDVLQlezSqynT0i4M5M+rkNLTQphjrmJEEvXezPz+QYWJ96rejYDnkgKoAlEPqtImHdkcWx8cyr4k2AvxFIuyN1gl+xJUGNb0twMdoAC4YZLrnIKKjgtmSAELPxRzYSmMeDGQfih98/4ZU4yQtfX/90PO0MOs5zIR3R1kPdiag/H5OqDvGEZkKz65ASTA/Um+UKvWuQ8UfHQ8pUjT/EjRxTfrK9Ysf1HSRy20tAgrqukY6C/Gpba1o+ZKdnIKRNhLSzDp99KkuPxt/KjE0AvNP7kgETjvUyTIE8Q6CgUilYh7pcVwhYB2VqRwCgPs6Bd2ukbW3Sm4PLOG2G5s1Q8hryO8U0jwYfu/9af2xfRg3blhfnzKymBRwxKy/j0/C6mS1d4Sc5jgWAtKfQiTK23qoItnY8zdIo4xJw6HZG7bflfKhIWTvPs6oBFdfWwTGzc=
   file_glob: true
-  file:
-    - "target/scala-2.12/openfda-*"
+  file: target/scala-2.12/openfda-*
   on:
     repo: opentargets/platform-etl-openfda-faers
     tags: true
     all_branches: false
   skip_cleanup: true
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
