@@ -1,7 +1,7 @@
 package io.opentargets.openfda.stage
 
 import com.typesafe.scalalogging.LazyLogging
-import io.opentargets.openfda.config.{Configuration, ETLSessionContext}
+import io.opentargets.openfda.config.ETLSessionContext
 import io.opentargets.openfda.utils.Loaders
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
