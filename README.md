@@ -205,6 +205,15 @@ exit 0
 
 The blacklist is a manually curated txt file to exclude events that are uninformative for our purposes. This is passed as a parameter to the `platformDataProcessFDA.sc` script. 
 
+### Outputs
+
+Spark will write the json results in many individual files as this allows each thread to write concurrently, rather
+than having to aggregate the data onto a single node before writing and is much faster. If you want all of the information
+in a single file the following command can be used: 
+
+`touch results.jsonl; find <directory with results> -name 'part*.json' -exec cat {} \; >> results.jsonl `
+
+
 # Copyright
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
 
