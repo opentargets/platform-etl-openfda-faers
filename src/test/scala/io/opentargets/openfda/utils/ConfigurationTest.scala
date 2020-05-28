@@ -16,13 +16,13 @@ class FdaConfigurationTest extends AnyFlatSpecLike with Matchers {
 
   "Fda config" should "not accept invalid output formats" in {
     a[IllegalArgumentException] should be thrownBy {
-      Fda(MonteCarlo(1, .04), FdaInputs("json", "jsonl", None), Seq("csv", "txt"))
+      Fda(MonteCarlo(1, .04), FdaInputs(".txt", "json", "jsonl"), Seq("csv", "txt"))
     }
   }
 
   "Fda config" should "accept output formats" in {
     val fdaConfig =
-      Fda(MonteCarlo(1, .04), FdaInputs("json", "jsonl", None), Seq("csv", "json", "jsonl"))
+      Fda(MonteCarlo(1, .04), FdaInputs(".txt", "json", "jsonl"), Seq("csv", "json", "jsonl"))
     assert(fdaConfig.outputs.length.equals(3))
   }
 
@@ -65,7 +65,7 @@ class FdaInputsTest extends AnyFlatSpecLike with TableDrivenPropertyChecks with 
   "Fda config" should "not accept invalid output formats" in {
     forAll(fdaInputInvalidCombos) { (blist: String, chembl: String, fda: String) =>
       a[IllegalArgumentException] should be thrownBy {
-        FdaInputs(chembl, fda, Some(blist))
+        FdaInputs(blist, chembl, fda)
       }
     }
   }

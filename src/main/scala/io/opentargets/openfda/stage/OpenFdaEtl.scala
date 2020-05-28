@@ -15,7 +15,7 @@ object OpenFdaEtl extends LazyLogging {
   def apply(implicit etLSessionContext: ETLSessionContext): DataFrame = {
     implicit val ss: SparkSession = etLSessionContext.sparkSession
 
-    val blackListPath: Option[String] = etLSessionContext.configuration.fda.fdaInputs.blacklist
+    val blackListPath: String = etLSessionContext.configuration.fda.fdaInputs.blacklist
     val chemblPath = etLSessionContext.configuration.fda.fdaInputs.chemblData
     val fdaPath = etLSessionContext.configuration.fda.fdaInputs.fdaData
 
@@ -25,8 +25,7 @@ object OpenFdaEtl extends LazyLogging {
     /* load the blacklist terms collect as a list and broadcast the field to
         all the cluster nodes thus it can be effectively used per row
      */
-    val bl = broadcast(
-      Loaders.loadBlackList(blackListPath.getOrElse(Configuration.defaultBlacklistPath)))
+    val bl = broadcast(Loaders.loadBlackList(blackListPath))
 
     val adverseEventReports = Loaders.loadFDA(fdaPath)
     // the curated drug list we want

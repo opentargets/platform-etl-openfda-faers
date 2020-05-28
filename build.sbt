@@ -6,7 +6,6 @@ lazy val root = (project in file("."))
     )),
     name := "openfda",
     version := "0.1.0",
-    //    sparkVersion := "2.4.5",
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled", "-Dlogback.configurationFile=logback.xml"),
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
@@ -16,7 +15,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= dependencies,
     // Assembly plugin configuration for fat jar
     mainClass in assembly := Some(s"${organization.value}.${name.value}.Main"),
-    assemblyJarName in assembly := s"${name.value}-${version.value}.jar",
+    assemblyJarName in assembly := s"io-opentargets-etl-backend-assembly-${name.value}-${version.value}.jar",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = true),
     test in assembly := {},
     assemblyMergeStrategy in assembly := {
