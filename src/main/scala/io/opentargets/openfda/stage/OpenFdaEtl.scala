@@ -1,7 +1,7 @@
 package io.opentargets.openfda.stage
 
 import com.typesafe.scalalogging.LazyLogging
-import io.opentargets.openfda.config.ETLSessionContext
+import io.opentargets.openfda.config.{Configuration, ETLSessionContext}
 import io.opentargets.openfda.utils.Loaders
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
@@ -12,19 +12,10 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
   */
 object OpenFdaEtl extends LazyLogging {
 
-  private def generateDrugList(chemblPath: String)(
-      implicit sparkSession: SparkSession): Dataset[Row] = {
-    val targetList = Loaders.loadTargetListFromChemblDrugs(chemblPath)
-    val chemblList = Loaders.loadChemblDrugList(chemblPath)
-    chemblList
-      .join(targetList, Seq("chembl_id"), "left")
-      .orderBy(col("drug_name"))
-  }
-
   def apply(implicit etLSessionContext: ETLSessionContext): DataFrame = {
     implicit val ss: SparkSession = etLSessionContext.sparkSession
 
-    val blackListPath = etLSessionContext.configuration.fda.fdaInputs.blacklist
+    val blackListPath: Option[String] = etLSessionContext.configuration.fda.fdaInputs.blacklist
     val chemblPath = etLSessionContext.configuration.fda.fdaInputs.chemblData
     val fdaPath = etLSessionContext.configuration.fda.fdaInputs.fdaData
 
@@ -34,11 +25,11 @@ object OpenFdaEtl extends LazyLogging {
     /* load the blacklist terms collect as a list and broadcast the field to
         all the cluster nodes thus it can be effectively used per row
      */
-    val bl = broadcast(Loaders.loadBlackList(blackListPath))
-    // the curated drug list we want
+    val bl = broadcast(
+      Loaders.loadBlackList(blackListPath.getOrElse(Configuration.defaultBlacklistPath)))
 
     val adverseEventReports = Loaders.loadFDA(fdaPath)
-
+    // the curated drug list we want
     val drugList: Dataset[Row] = generateDrugList(chemblPath).cache()
 
     val fdasF = adverseEventReports
@@ -95,11 +86,11 @@ object OpenFdaEtl extends LazyLogging {
     // and we will need this processed data later on
     val fdas = fdasFiltered
       .join(drugList, Seq("drug_name"), "inner")
-      .withColumn("uniq_report_ids_by_reaction",
+      .withColumn("uniq_report_ids_by_reaction", // how many reports mention that reaction
                   approx_count_distinct(col("safetyreportid")).over(wAdverses))
-      .withColumn("uniq_report_ids_by_drug",
+      .withColumn("uniq_report_ids_by_drug", // how many reports mention that drug
                   approx_count_distinct(col("safetyreportid")).over(wDrugs))
-      .withColumn("uniq_report_ids",
+      .withColumn("uniq_report_ids", // how many mentions of drug-reaction pair
                   approx_count_distinct(col("safetyreportid")).over(wAdverseDrugComb))
       .select(
         "safetyreportid",
@@ -114,21 +105,6 @@ object OpenFdaEtl extends LazyLogging {
     val uniqReports = fdas.select("safetyreportid").distinct.count
 
     // compute llr and its needed terms as per drug-reaction pair
-    /*
-    root
-    | chembl_id
-    | reaction_reactionmedrapt
-    | uniq_report_ids_by_reaction
-    | uniq_report_ids_by_drug
-    | A
-    | B
-    | C
-    | D
-    | aterm
-    | bterm
-    | acterm
-    | llr
-     */
     val doubleAgg = fdas
       .drop("safetyreportid")
       .withColumnRenamed("uniq_report_ids", "A")
@@ -148,4 +124,12 @@ object OpenFdaEtl extends LazyLogging {
 
   }
 
+  private def generateDrugList(chemblPath: String)(
+      implicit sparkSession: SparkSession): Dataset[Row] = {
+    val targetList = Loaders.loadTargetListFromChemblDrugs(chemblPath)
+    val chemblList = Loaders.loadChemblDrugList(chemblPath)
+    chemblList
+      .join(targetList, Seq("chembl_id"), "left")
+      .orderBy(col("drug_name"))
+  }
 }

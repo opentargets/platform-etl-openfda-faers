@@ -1,9 +1,9 @@
 package io.opentargets.openfda.stage
 
 import io.opentargets.openfda.config.ETLSessionContext
-import io.opentargets.openfda.utils.{Loaders, MathUtils}
+import io.opentargets.openfda.utils.MathUtils
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{collect_list, first, lit, udf}
-import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object MonteCarloSampling {
 
@@ -29,6 +29,8 @@ object MonteCarloSampling {
         collect_list($"uniq_report_ids_by_reaction").as("n_i"),
         first($"uniq_report_ids_by_drug").as("uniq_report_ids_by_drug"),
       )
+      // critVal_drug is created using the MonteCarlo method to use a binomial distribution
+      // for that particular drug.
       .withColumn("critVal_drug",
                   udfProbVector(lit(permutations),
                                 $"uniq_report_ids_by_drug",
