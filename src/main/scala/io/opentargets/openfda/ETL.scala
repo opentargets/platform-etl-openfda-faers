@@ -15,12 +15,12 @@ object ETL extends LazyLogging {
         logger.info("run step fda pipeline...")
         val fdaConfig = context.configuration.fda
         logger.info("Aggregating FDA data...")
-        val openFdaDataAggByChembl: DataFrame = OpenFdaEtl.apply
+        val openFdaDataAggByChembl: DataFrame = OpenFdaEtl.apply.cache()
 
         logger.info("Performing Monte Carlo sampling...")
         val mcResults: DataFrame = MonteCarloSampling(openFdaDataAggByChembl,
                                                       fdaConfig.montecarlo.percentile,
-                                                      fdaConfig.montecarlo.permutations)
+                                                      fdaConfig.montecarlo.permutations).cache()
 
         // write results if necessary
         logger.info("Writing results of FDA pipeline...")

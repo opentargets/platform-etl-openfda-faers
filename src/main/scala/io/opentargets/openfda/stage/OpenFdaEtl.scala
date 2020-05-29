@@ -26,11 +26,33 @@ object OpenFdaEtl extends LazyLogging {
         all the cluster nodes thus it can be effectively used per row
      */
     val bl = broadcast(Loaders.loadBlackList(blackListPath))
-
-    val adverseEventReports = Loaders.loadFDA(fdaPath)
     // the curated drug list we want
     val drugList: Dataset[Row] = generateDrugList(chemblPath).cache()
 
+    val fdaData = prepareAdverseEventsData(fdaPath)
+
+    // remove blacklisted reactions using a left_anti which is the complement of
+    // left_semi so the ones from the left side which are not part of the equality
+    val fdaDataFilteredByBlackListAndJoinedWithDrug = filterBlacklist(blackListPath, fdaData)
+      .join(drugList, Seq("drug_name"), "inner")
+
+    val groupedByIds = prepareSummaryStatistics(fdaDataFilteredByBlackListAndJoinedWithDrug)
+
+    prepareForMonteCarlo(groupedByIds)
+
+  }
+
+  private def filterBlacklist(blacklistPath: String, df: Dataset[Row])(
+      implicit sparkSession: SparkSession): Dataset[Row] = {
+    val bl = broadcast(Loaders.loadBlackList(blacklistPath))
+    df.join(bl, df("reaction_reactionmeddrapt") === bl("reactions"), "left_anti")
+
+  }
+
+  private def prepareAdverseEventsData(path: String)(
+      implicit sparkSession: SparkSession): Dataset[Row] = {
+    import sparkSession.implicits._
+    val adverseEventReports = Loaders.loadFDA(path)
     val fdasF = adverseEventReports
       .withColumn("reaction", explode(col("patient.reaction")))
       // after explode this we will have reaction-drug pairs
@@ -71,11 +93,11 @@ object OpenFdaEtl extends LazyLogging {
       .where($"drug_name".isNotNull and $"reaction_reactionmeddrapt".isNotNull and
         $"safetyreportid".isNotNull and $"seriousness_death" === "0" and
         $"drug_name" =!= "")
+    fdasF
+  }
 
-    // remove blacklisted reactions using a left_anti which is the complement of
-    // left_semi so the ones from the left side which are not part of the equality
-    val fdasFiltered = fdasF
-      .join(bl, fdasF("reaction_reactionmeddrapt") === bl("reactions"), "left_anti")
+  private def prepareSummaryStatistics(df: DataFrame)(
+      implicit sparkSession: SparkSession): Dataset[Row] = {
 
     val wAdverses = Window.partitionBy(col("reaction_reactionmeddrapt"))
     val wDrugs = Window.partitionBy(col("chembl_id"))
@@ -83,8 +105,7 @@ object OpenFdaEtl extends LazyLogging {
       Window.partitionBy(col("chembl_id"), col("reaction_reactionmeddrapt"))
 
     // and we will need this processed data later on
-    val fdas = fdasFiltered
-      .join(drugList, Seq("drug_name"), "inner")
+    val groupedDf = df
       .withColumn("uniq_report_ids_by_reaction", // how many reports mention that reaction
                   approx_count_distinct(col("safetyreportid")).over(wAdverses))
       .withColumn("uniq_report_ids_by_drug", // how many reports mention that drug
@@ -99,12 +120,17 @@ object OpenFdaEtl extends LazyLogging {
         "uniq_report_ids_by_drug",
         "uniq_report_ids"
       )
+    groupedDf
+  }
 
+  // compute llr and its needed terms as per drug-reaction pair
+  private def prepareForMonteCarlo(df: DataFrame)(
+      implicit sparkSession: SparkSession): Dataset[Row] = {
+
+    import sparkSession.implicits._
     // total unique report ids
-    val uniqReports = fdas.select("safetyreportid").distinct.count
-
-    // compute llr and its needed terms as per drug-reaction pair
-    val doubleAgg = fdas
+    val uniqReports: Long = df.select("safetyreportid").distinct.count
+    val doubleAgg = df
       .drop("safetyreportid")
       .withColumnRenamed("uniq_report_ids", "A")
       .withColumn("C", col("uniq_report_ids_by_drug") - col("A"))
@@ -120,15 +146,10 @@ object OpenFdaEtl extends LazyLogging {
       .where($"llr".isNotNull and !$"llr".isNaN)
 
     doubleAgg
-
   }
 
   private def generateDrugList(chemblPath: String)(
       implicit sparkSession: SparkSession): Dataset[Row] = {
-    val targetList = Loaders.loadTargetListFromChemblDrugs(chemblPath)
-    val chemblList = Loaders.loadChemblDrugList(chemblPath)
-    chemblList
-      .join(targetList, Seq("chembl_id"), "left")
-      .orderBy(col("drug_name"))
+    Loaders.loadChemblDrugList(chemblPath).orderBy(col("drug_name"))
   }
 }
