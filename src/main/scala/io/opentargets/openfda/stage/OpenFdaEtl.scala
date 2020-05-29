@@ -22,10 +22,6 @@ object OpenFdaEtl extends LazyLogging {
     import ss.implicits._
 
     // load inputs
-    /* load the blacklist terms collect as a list and broadcast the field to
-        all the cluster nodes thus it can be effectively used per row
-     */
-    val bl = broadcast(Loaders.loadBlackList(blackListPath))
     // the curated drug list we want
     val drugList: Dataset[Row] = generateDrugList(chemblPath).cache()
 
