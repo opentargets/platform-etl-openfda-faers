@@ -13,7 +13,7 @@ object MathUtils {
     import breeze.linalg._
     import breeze.stats._
 
-    val drug_count = n_j.toDouble
+    val z = n_j.toDouble
     val N = total.toDouble
     val y = convert(BDV(n_i.toArray), Double)
     val probV = y / N
@@ -27,12 +27,12 @@ object MathUtils {
       val X = x(c, ::).t
       val lX = breeze.numerics.log(X)
       val ly = math.log(y(c))
-      val lzX = breeze.numerics.log(drug_count - X)
-      val XX = X *:* (lX - ly) + (drug_count - X) *:* (lzX - math.log(N - y(c)))
+      val lzX = breeze.numerics.log(z - X)
+      val XX = X *:* (lX - ly) + (z - X) *:* (lzX - math.log(N - y(c)))
       LLRS(c, ::) := XX.t
     }
 
-    LLRS := LLRS - drug_count * math.log(drug_count) + drug_count * math.log(N)
+    LLRS := LLRS - z * math.log(z) + z * math.log(N)
     LLRS(LLRS.findAll(e => e.isNaN || e.isInfinity)) := 0.0
     val maxLLRS = breeze.linalg.max(LLRS(::, *))
     val critVal = DescriptiveStats.percentile(maxLLRS.t.data, prob)
