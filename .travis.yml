@@ -1,24 +1,23 @@
 dist: xenial
 language: scala
 scala:
-  - 2.12.10
+- 2.12.10
 jdk:
-  - openjdk8
+- openjdk8
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean compile
-  - sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
-  - sbt ++$TRAVIS_SCALA_VERSION assembly
+- sbt ++$TRAVIS_SCALA_VERSION clean compile
+- sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport
+- sbt ++$TRAVIS_SCALA_VERSION assembly
 deploy:
   provider: releases
   api_key:
     secure: ahq+k8BZ03sgMRh3EBpIxQdVdy0uX8URZHgMsUz9MaOhKkk2Zbi58lscJDBIVmpqoRLS5D88LgcLXjK9hE+6EaMzvIH9DyBvWssUcXTNAp3o21xbr9yyGQd3hWBksikcZAjKJ9qQwFAb2FBoJ6ZHb1vm8KJ2kuQiGLV0GmteYIWyjZ0NhP2hNwq9+tEkUavSD4NYwQ87cyak8P7dn9XmEM6TbIwEw0xmrM4hajoCNP21O8JMSfFEEzHP9wvXtY2bqw27Zi9Mo24D4P2soX3Uk55KlYZ2D5MdNyArIkJyaAx3134QDXPibHe3LsDjYc2Tl3mzlUIsQmOoexm7GIIG6VKd6MPeHSGceOdaMbTPdJWlPN0XV1LTvxPnmqqz7lBrblieILAqbDjh6ukpZXWEl5aNmDC6wtvPlP3I8m5hMedz+a2f+3LAXaRQSam80OfAJDF8pD7AAk3+d2iUuxyJwktDkwI3AzkGrwOHgnzGLPoE2xMUkHW783j7tNjJSpkVRiyGfc6MwzcFeGckXsuZqZI6BK0q6fvBATEPzai8WNFRXXLAWppZBeIGxaEo659Z+YCb4psMXQzpYXhhHoVcItMmo0EjedeyYtUfFRXOj2rag+tS0ePEEvDEFrrXjcrjOxkuyPGqDHJrz8Wa2Q8Qaw6kgMciZ2C6ewpCEAtb5pk=
   file_glob: true
-  file:
-    - "target/scala-2.12/openfda-*"
+  file: target/scala-2.12/openfda-*
   on:
     repo: opentargets/platform-etl-openfda-faers
     tags: true
     all_branches: false
   skip_cleanup: true
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
