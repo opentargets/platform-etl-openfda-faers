@@ -18,15 +18,18 @@ object ETL extends LazyLogging {
         val openFdaDataAggByChembl: DataFrame = OpenFdaEtl.apply.cache()
 
         logger.info("Performing Monte Carlo sampling...")
-        val mcResults: DataFrame = MonteCarloSampling(openFdaDataAggByChembl,
-                                                      fdaConfig.montecarlo.percentile,
-                                                      fdaConfig.montecarlo.permutations).cache()
+        val mcResults = MonteCarloSampling(openFdaDataAggByChembl,
+                                           fdaConfig.montecarlo.percentile,
+                                           fdaConfig.montecarlo.permutations).cache()
 
         // write results if necessary
         logger.info("Writing results of FDA pipeline...")
+
         Writers.writeFdaResults(openFdaDataAggByChembl, context.configuration.common.output)
 
         if (fdaConfig.outputs.nonEmpty) {
+          // force evaluation so mcResults is written for each extension but not reevaluated
+          mcResults.take(1)
           fdaConfig.outputs.foreach { extension =>
             Writers.writeMonteCarloResults(mcResults,
                                            context.configuration.common.output,
