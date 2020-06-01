@@ -5,6 +5,7 @@ import io.opentargets.openfda.config.ETLSessionContext
 import io.opentargets.openfda.stage.{MonteCarloSampling, OpenFdaEtl}
 import io.opentargets.openfda.utils.Writers
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.storage.StorageLevel
 
 object ETL extends LazyLogging {
 
@@ -15,12 +16,15 @@ object ETL extends LazyLogging {
         logger.info("run step fda pipeline...")
         val fdaConfig = context.configuration.fda
         logger.info("Aggregating FDA data...")
-        val openFdaDataAggByChembl: DataFrame = OpenFdaEtl.apply.cache()
+        val openFdaDataAggByChembl: DataFrame =
+          OpenFdaEtl(context).persist(StorageLevel.MEMORY_AND_DISK_SER)
 
         logger.info("Performing Monte Carlo sampling...")
-        val mcResults = MonteCarloSampling(openFdaDataAggByChembl,
-                                           fdaConfig.montecarlo.percentile,
-                                           fdaConfig.montecarlo.permutations).cache()
+        val mcResults =
+          MonteCarloSampling(
+            openFdaDataAggByChembl,
+            fdaConfig.montecarlo.percentile,
+            fdaConfig.montecarlo.permutations).persist(StorageLevel.MEMORY_AND_DISK_SER)
 
         // write results if necessary
         logger.info("Writing results of FDA pipeline...")
@@ -28,8 +32,6 @@ object ETL extends LazyLogging {
         Writers.writeFdaResults(openFdaDataAggByChembl, context.configuration.common.output)
 
         if (fdaConfig.outputs.nonEmpty) {
-          // force evaluation so mcResults is written for each extension but not reevaluated
-          mcResults.take(1)
           fdaConfig.outputs.foreach { extension =>
             Writers.writeMonteCarloResults(mcResults,
                                            context.configuration.common.output,

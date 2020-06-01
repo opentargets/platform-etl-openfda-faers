@@ -5,7 +5,7 @@ import io.opentargets.openfda.config.ETLSessionContext
 import io.opentargets.openfda.utils.Loaders
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
   * Extract key information from the FDA dataset.
@@ -23,7 +23,7 @@ object OpenFdaEtl extends LazyLogging {
 
     // load inputs
     // the curated drug list we want
-    val drugList: Dataset[Row] = generateDrugList(chemblPath).cache()
+    val drugList: DataFrame = generateDrugList(chemblPath)
 
     val fdaData = prepareAdverseEventsData(fdaPath)
 
@@ -38,15 +38,15 @@ object OpenFdaEtl extends LazyLogging {
 
   }
 
-  private def filterBlacklist(blacklistPath: String, df: Dataset[Row])(
-      implicit sparkSession: SparkSession): Dataset[Row] = {
+  private def filterBlacklist(blacklistPath: String, df: DataFrame)(
+      implicit sparkSession: SparkSession): DataFrame = {
     val bl = broadcast(Loaders.loadBlackList(blacklistPath))
     df.join(bl, df("reaction_reactionmeddrapt") === bl("reactions"), "left_anti")
 
   }
 
   private def prepareAdverseEventsData(path: String)(
-      implicit sparkSession: SparkSession): Dataset[Row] = {
+      implicit sparkSession: SparkSession): DataFrame = {
     import sparkSession.implicits._
     val adverseEventReports = Loaders.loadFDA(path)
     val fdasF = adverseEventReports
@@ -93,7 +93,7 @@ object OpenFdaEtl extends LazyLogging {
   }
 
   private def prepareSummaryStatistics(df: DataFrame)(
-      implicit sparkSession: SparkSession): Dataset[Row] = {
+      implicit sparkSession: SparkSession): DataFrame = {
 
     val wAdverses = Window.partitionBy(col("reaction_reactionmeddrapt"))
     val wDrugs = Window.partitionBy(col("chembl_id"))
@@ -121,7 +121,7 @@ object OpenFdaEtl extends LazyLogging {
 
   // compute llr and its needed terms as per drug-reaction pair
   private def prepareForMonteCarlo(df: DataFrame)(
-      implicit sparkSession: SparkSession): Dataset[Row] = {
+      implicit sparkSession: SparkSession): DataFrame = {
 
     import sparkSession.implicits._
     // total unique report ids
@@ -145,7 +145,7 @@ object OpenFdaEtl extends LazyLogging {
   }
 
   private def generateDrugList(chemblPath: String)(
-      implicit sparkSession: SparkSession): Dataset[Row] = {
+      implicit sparkSession: SparkSession): DataFrame = {
     Loaders.loadChemblDrugList(chemblPath).orderBy(col("drug_name"))
   }
 }

@@ -4,15 +4,13 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
-import scala.util.Random
-
 class MathUtilsTest extends AnyFlatSpecLike with Matchers {
   import breeze.linalg._
 
   "Each row of rmultinomial probabilities" should "sum to 'size' where 'size' is the number of options" in {
     val size = 10
     val multis: BDM[Double] =
-      MathUtils.rmultinom(10, size, BDV(Seq.fill(10)(Random.nextDouble).toArray))
+      MathUtils.rmultinom(10, size, BDV.rand(size))
     val rowSums = sum(multis, Axis._0)
     assert(rowSums.inner.forall(s => s == size))
   }
@@ -20,7 +18,7 @@ class MathUtilsTest extends AnyFlatSpecLike with Matchers {
   "Each column" should "represent a random sample from the distribution" in {
     val size, iters = 10
     val multis: BDM[Double] =
-      MathUtils.rmultinom(iters, size, BDV(Seq.fill(size)(Random.nextDouble).toArray))
+      MathUtils.rmultinom(iters, size, BDV.rand(size))
     val colMax = max(multis, Axis._1)
     val colMin = min(multis, Axis._1)
     val diffs = colMax - colMin
