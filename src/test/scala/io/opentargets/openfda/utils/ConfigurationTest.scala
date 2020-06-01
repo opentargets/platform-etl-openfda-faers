@@ -1,4 +1,4 @@
-package io.opentargets.openfda
+package io.opentargets.openfda.utils
 
 import io.opentargets.openfda.config.{Configuration, Fda, FdaInputs, MonteCarlo}
 import org.scalatest.flatspec.AnyFlatSpecLike

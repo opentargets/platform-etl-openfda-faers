@@ -1,6 +1,5 @@
-package io.opentargets.openfda
+package io.opentargets.openfda.utils
 
-import io.opentargets.openfda.utils.Loaders
 import org.apache.spark.sql.SparkSession
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike

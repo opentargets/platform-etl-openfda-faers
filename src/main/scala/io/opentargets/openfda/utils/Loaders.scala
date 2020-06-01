@@ -24,21 +24,6 @@ object Loaders extends LazyLogging {
     drugList
   }
 
-  /** generate a target id set from the the drug index dump extracted from
-    * mechanisms of action */
-  def loadTargetListFromChemblDrugs(path: String)(implicit ss: SparkSession): DataFrame = {
-    logger.info("Loading ChEMBL targets...")
-    val tList = ss.read
-      .json(path)
-      .selectExpr("id as chembl_id", "mechanisms_of_action")
-      .withColumn("mechanism_of_action", explode(col("mechanisms_of_action")))
-      .withColumn("target_component", explode(col("mechanism_of_action.target_components")))
-      .selectExpr("chembl_id", "target_component.ensembl as target_id")
-      .distinct()
-
-    tList
-  }
-
   /** load initial OpenFDA FAERS json-lines and preselect needed fields  */
   def loadFDA(path: String)(implicit ss: SparkSession): DataFrame = {
 

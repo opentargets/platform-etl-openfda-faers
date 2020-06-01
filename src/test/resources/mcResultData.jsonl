@@ -1,0 +1,366 @@
+{"chembl_id":"CHEMBL109","event":"abnormal behaviour","report_count":3,"llr":6.465490468045175,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"aggression","report_count":3,"llr":7.091245337020609,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"agitation","report_count":4,"llr":8.493027355653794,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"altered state of consciousness","report_count":3,"llr":7.784229066880698,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"autism spectrum disorder","report_count":4,"llr":15.726461756955644,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"coma","report_count":3,"llr":6.198942856953579,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"congenital anomaly","report_count":2,"llr":7.258126243232823,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"developmental delay","report_count":3,"llr":12.663509912365043,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"disorientation","report_count":3,"llr":6.760732162381544,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"disturbance in attention","report_count":5,"llr":14.388038925106912,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"disturbance in social behaviour","report_count":2,"llr":7.258126243232823,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"drug interaction","report_count":12,"llr":21.295980905947943,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"dysarthria","report_count":4,"llr":9.072944129827647,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"dysmorphism","report_count":2,"llr":7.619538522187611,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"epilepsy","report_count":4,"llr":10.375097983697856,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"extrapyramidal disorder","report_count":3,"llr":9.822373842925856,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"foetal anticonvulsant syndrome","report_count":2,"llr":9.442428580658827,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"hyperammonaemia","report_count":5,"llr":18.275173656768743,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"impulse-control disorder","report_count":2,"llr":7.619538522187611,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"intellectual disability","report_count":2,"llr":9.442428580658827,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"muscle contractions involuntary","report_count":2,"llr":7.619538522187611,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"myopia","report_count":2,"llr":7.258126243232823,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"neuroleptic malignant syndrome","report_count":3,"llr":10.059326552716584,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"psychomotor retardation","report_count":2,"llr":6.456889629828936,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"seizure","report_count":8,"llr":13.95824639396426,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"speech disorder","report_count":3,"llr":6.136187503081317,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"toxic encephalopathy","report_count":2,"llr":7.619538522187611,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"toxic epidermal necrolysis","report_count":3,"llr":8.552258030311918,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"toxicity to various agents","report_count":6,"llr":8.905698056636083,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"tremor","report_count":5,"llr":8.16207019037239,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL109","event":"unresponsive to stimuli","report_count":3,"llr":7.898713450629657,"critval":6.0907840904567605}
+{"chembl_id":"CHEMBL2159122","event":"burn oral cavity","report_count":1,"llr":8.392140045623442,"critval":6.195368905918979}
+{"chembl_id":"CHEMBL2159122","event":"oral mucosal erythema","report_count":1,"llr":8.392140045623442,"critval":6.195368905918979}
+{"chembl_id":"CHEMBL502835","event":"diarrhoea","report_count":9,"llr":10.981908982421345,"critval":5.514016898289822}
+{"chembl_id":"CHEMBL502835","event":"liver function test abnormal","report_count":2,"llr":5.541250341365725,"critval":5.514016898289822}
+{"chembl_id":"CHEMBL79","event":"blood pressure increased","report_count":5,"llr":8.453373042222722,"critval":7.290718839101918}
+{"chembl_id":"CHEMBL79","event":"drug hypersensitivity","report_count":12,"llr":17.7827105317632,"critval":7.290718839101918}
+{"chembl_id":"CHEMBL79","event":"dystonia","report_count":4,"llr":13.530023440369916,"critval":7.290718839101918}
+{"chembl_id":"CHEMBL79","event":"methaemoglobinaemia","report_count":3,"llr":14.761263103217516,"critval":7.290718839101918}
+{"chembl_id":"CHEMBL79","event":"sinus tachycardia","report_count":4,"llr":12.447594337524663,"critval":7.290718839101918}
+{"chembl_id":"CHEMBL79","event":"toxicity to various agents","report_count":5,"llr":7.437689033118545,"critval":7.290718839101918}
+{"chembl_id":"CHEMBL108","event":"coma","report_count":4,"llr":12.619531805913113,"critval":7.420229465267118}
+{"chembl_id":"CHEMBL108","event":"hyponatraemia","report_count":5,"llr":13.303779318212946,"critval":7.420229465267118}
+{"chembl_id":"CHEMBL108","event":"sedation","report_count":3,"llr":9.383867193938585,"critval":7.420229465267118}
+{"chembl_id":"CHEMBL108","event":"toxicity to various agents","report_count":5,"llr":10.432411408618748,"critval":7.420229465267118}
+{"chembl_id":"CHEMBL844","event":"eye pain","report_count":3,"llr":13.240991567427102,"critval":10.335541442211166}
+{"chembl_id":"CHEMBL844","event":"insomnia","report_count":5,"llr":17.083920305312816,"critval":10.335541442211166}
+{"chembl_id":"CHEMBL844","event":"nasal dryness","report_count":3,"llr":16.32270250426489,"critval":10.335541442211166}
+{"chembl_id":"CHEMBL24441","event":"cardio-respiratory arrest","report_count":1,"llr":5.502732088578597,"critval":5.375603485905983}
+{"chembl_id":"CHEMBL24441","event":"eye pruritus","report_count":1,"llr":5.7538196566044455,"critval":5.375603485905983}
+{"chembl_id":"CHEMBL24441","event":"lacrimation increased","report_count":1,"llr":5.397485022350809,"critval":5.375603485905983}
+{"chembl_id":"CHEMBL24441","event":"parkinson's disease","report_count":1,"llr":6.195368905918979,"critval":5.375603485905983}
+{"chembl_id":"CHEMBL24441","event":"sinus bradycardia","report_count":1,"llr":5.559833782529701,"critval":5.375603485905983}
+{"chembl_id":"CHEMBL24441","event":"vitamin b12 decreased","report_count":1,"llr":6.782928826304511,"critval":5.375603485905983}
+{"chembl_id":"CHEMBL6966","event":"cardiac arrest","report_count":3,"llr":11.616337498457767,"critval":6.710681512070735}
+{"chembl_id":"CHEMBL6966","event":"toxicity to various agents","report_count":3,"llr":7.232773621411411,"critval":6.710681512070735}
+{"chembl_id":"CHEMBL192","event":"blood pressure decreased","report_count":4,"llr":8.61078209832067,"critval":6.307102240066165}
+{"chembl_id":"CHEMBL192","event":"deafness","report_count":3,"llr":8.053004139960763,"critval":6.307102240066165}
+{"chembl_id":"CHEMBL192","event":"flushing","report_count":4,"llr":8.672053942224977,"critval":6.307102240066165}
+{"chembl_id":"CHEMBL192","event":"visual field defect","report_count":2,"llr":6.31491092482878,"critval":6.307102240066165}
+{"chembl_id":"CHEMBL1473","event":"ectropion","report_count":2,"llr":13.403898666326413,"critval":10.730526242399204}
+{"chembl_id":"CHEMBL1473","event":"tendon disorder","report_count":2,"llr":12.593365151818837,"critval":10.730526242399204}
+{"chembl_id":"CHEMBL385517","event":"hyperinsulinaemic hypoglycaemia","report_count":1,"llr":7.868948567108948,"critval":6.333856684598979}
+{"chembl_id":"CHEMBL255863","event":"acne","report_count":2,"llr":5.334739344628218,"critval":5.325810530095715}
+{"chembl_id":"CHEMBL255863","event":"aspartate aminotransferase increased","report_count":3,"llr":6.445864135530087,"critval":5.325810530095715}
+{"chembl_id":"CHEMBL255863","event":"blood bilirubin increased","report_count":4,"llr":11.186828313926839,"critval":5.325810530095715}
+{"chembl_id":"CHEMBL255863","event":"blood glucose increased","report_count":3,"llr":6.233494429767148,"critval":5.325810530095715}
+{"chembl_id":"CHEMBL255863","event":"head discomfort","report_count":2,"llr":6.471912710160467,"critval":5.325810530095715}
+{"chembl_id":"CHEMBL255863","event":"platelet count decreased","report_count":4,"llr":6.751914532313492,"critval":5.325810530095715}
+{"chembl_id":"CHEMBL255863","event":"subcutaneous abscess","report_count":2,"llr":7.136692066561324,"critval":5.325810530095715}
+{"chembl_id":"CHEMBL255863","event":"transaminases increased","report_count":3,"llr":8.415863263739595,"critval":5.325810530095715}
+{"chembl_id":"CHEMBL1289601","event":"blood bilirubin increased","report_count":3,"llr":7.759049212949009,"critval":6.09385486440503}
+{"chembl_id":"CHEMBL1289601","event":"decreased appetite","report_count":6,"llr":7.754151240398244,"critval":6.09385486440503}
+{"chembl_id":"CHEMBL1289601","event":"dysphonia","report_count":3,"llr":7.175221011584199,"critval":6.09385486440503}
+{"chembl_id":"CHEMBL1289601","event":"hepatic encephalopathy","report_count":2,"llr":8.011888820757122,"critval":6.09385486440503}
+{"chembl_id":"CHEMBL1289601","event":"hypertension","report_count":7,"llr":12.250673351849201,"critval":6.09385486440503}
+{"chembl_id":"CHEMBL1289601","event":"renal cancer","report_count":2,"llr":7.513001460798023,"critval":6.09385486440503}
+{"chembl_id":"CHEMBL1289601","event":"tumour haemorrhage","report_count":2,"llr":8.318319591175566,"critval":6.09385486440503}
+{"chembl_id":"CHEMBL1789844","event":"autoimmune hepatitis","report_count":4,"llr":14.655236244913795,"critval":6.249034821868804}
+{"chembl_id":"CHEMBL1789844","event":"diabetic ketoacidosis","report_count":3,"llr":7.32333551926024,"critval":6.249034821868804}
+{"chembl_id":"CHEMBL1789844","event":"hyperthyroidism","report_count":4,"llr":12.838544613772626,"critval":6.249034821868804}
+{"chembl_id":"CHEMBL1789844","event":"immune-mediated hepatitis","report_count":2,"llr":9.477102240291686,"critval":6.249034821868804}
+{"chembl_id":"CHEMBL1789844","event":"lymphocytic hypophysitis","report_count":2,"llr":8.669345637745437,"critval":6.249034821868804}
+{"chembl_id":"CHEMBL1789844","event":"pneumonitis","report_count":5,"llr":13.296790586829104,"critval":6.249034821868804}
+{"chembl_id":"CHEMBL376359","event":"pemphigoid","report_count":3,"llr":14.928143156966769,"critval":9.836561312453483}
+{"chembl_id":"CHEMBL1201581","event":"alopecia","report_count":10,"llr":12.197015523572531,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"anal abscess","report_count":3,"llr":7.8315361393785,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"blood pressure fluctuation","report_count":5,"llr":12.474018187176057,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"c-reactive protein increased","report_count":6,"llr":8.435964483825614,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"condition aggravated","report_count":11,"llr":9.31116707084243,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"crohn's disease","report_count":7,"llr":15.718899402559941,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"disability","report_count":4,"llr":10.45367277769185,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"drug intolerance","report_count":18,"llr":31.491939181380076,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"drug level below therapeutic","report_count":4,"llr":12.564019978831425,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"drug specific antibody present","report_count":3,"llr":10.218412324664314,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"herpes zoster","report_count":5,"llr":6.272760472636037,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"infusion related reaction","report_count":10,"llr":18.190588920414598,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"joint swelling","report_count":11,"llr":16.315535805770196,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"loss of personal independence in daily activities","report_count":5,"llr":9.597248301610648,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"pain","report_count":14,"llr":7.851813913078104,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"parvovirus b19 infection","report_count":2,"llr":7.375508415824129,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"pemphigus","report_count":3,"llr":8.567112077262664,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"psoriatic arthropathy","report_count":4,"llr":6.9529167402970415,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"red blood cell sedimentation rate abnormal","report_count":3,"llr":8.175701312560136,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"rheumatoid arthritis","report_count":27,"llr":58.344228639246694,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"swelling","report_count":7,"llr":8.58564796317114,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"synovitis","report_count":5,"llr":13.081685081599971,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"systemic lupus erythematosus","report_count":4,"llr":9.339464846439682,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"therapy non-responder","report_count":4,"llr":7.079384825136913,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL1201581","event":"treatment failure","report_count":12,"llr":22.446231627891734,"critval":6.007689543531114}
+{"chembl_id":"CHEMBL135","event":"vulvovaginal mycotic infection","report_count":3,"llr":17.000382601383194,"critval":14.741839902714133}
+{"chembl_id":"CHEMBL1496","event":"angina unstable","report_count":2,"llr":7.717707450297667,"critval":5.190816830427627}
+{"chembl_id":"CHEMBL1496","event":"cardiac failure","report_count":3,"llr":5.413300851037263,"critval":5.190816830427627}
+{"chembl_id":"CHEMBL1496","event":"myalgia","report_count":7,"llr":11.503863934378387,"critval":5.190816830427627}
+{"chembl_id":"CHEMBL1496","event":"myopathy","report_count":3,"llr":10.296123370906855,"critval":5.190816830427627}
+{"chembl_id":"CHEMBL1496","event":"pain in extremity","report_count":6,"llr":7.529334118983627,"critval":5.190816830427627}
+{"chembl_id":"CHEMBL1496","event":"pulmonary hypertension","report_count":3,"llr":8.148851493872257,"critval":5.190816830427627}
+{"chembl_id":"CHEMBL1496","event":"rhabdomyolysis","report_count":6,"llr":15.915997877518976,"critval":5.190816830427627}
+{"chembl_id":"CHEMBL1496","event":"vascular purpura","report_count":3,"llr":12.358102120011608,"critval":5.190816830427627}
+{"chembl_id":"CHEMBL596","event":"adenocarcinoma pancreas","report_count":2,"llr":8.279657666235948,"critval":5.753919001153486}
+{"chembl_id":"CHEMBL596","event":"drug hypersensitivity","report_count":10,"llr":12.193338411714706,"critval":5.753919001153486}
+{"chembl_id":"CHEMBL596","event":"hyperaesthesia","report_count":2,"llr":6.672251787084349,"critval":5.753919001153486}
+{"chembl_id":"CHEMBL596","event":"miosis","report_count":2,"llr":6.46442215809958,"critval":5.753919001153486}
+{"chembl_id":"CHEMBL596","event":"neuroleptic malignant syndrome","report_count":2,"llr":6.105562340996869,"critval":5.753919001153486}
+{"chembl_id":"CHEMBL596","event":"pain","report_count":8,"llr":8.36870268015275,"critval":5.753919001153486}
+{"chembl_id":"CHEMBL596","event":"pancreatic carcinoma metastatic","report_count":2,"llr":9.660171352937653,"critval":5.753919001153486}
+{"chembl_id":"CHEMBL596","event":"somnolence","report_count":5,"llr":6.711099820268657,"critval":5.753919001153486}
+{"chembl_id":"CHEMBL1201222","event":"disturbance in social behaviour","report_count":2,"llr":11.7870496228065,"critval":11.567651173450109}
+{"chembl_id":"CHEMBL1531","event":"implant site fibrosis","report_count":2,"llr":10.968485863131463,"critval":10.801798088043881}
+{"chembl_id":"CHEMBL1531","event":"implant site pain","report_count":4,"llr":19.32336977355834,"critval":10.801798088043881}
+{"chembl_id":"CHEMBL1531","event":"implant site scar","report_count":2,"llr":10.968485863131463,"critval":10.801798088043881}
+{"chembl_id":"CHEMBL1531","event":"pregnancy with implant contraceptive","report_count":4,"llr":22.09051693586096,"critval":10.801798088043881}
+{"chembl_id":"CHEMBL1531","event":"unintended pregnancy","report_count":5,"llr":23.77858295883695,"critval":10.801798088043881}
+{"chembl_id":"CHEMBL1626","event":"long qt syndrome","report_count":3,"llr":19.339709866544872,"critval":11.158815304170181}
+{"chembl_id":"CHEMBL1626","event":"torsade de pointes","report_count":4,"llr":25.036102324004375,"critval":11.158815304170181}
+{"chembl_id":"CHEMBL2079587","event":"hypogonadism male","report_count":1,"llr":8.392140045623442,"critval":6.313095250626057}
+{"chembl_id":"CHEMBL2079587","event":"testicular atrophy","report_count":1,"llr":8.392140045623442,"critval":6.313095250626057}
+{"chembl_id":"CHEMBL1168","event":"angioedema","report_count":6,"llr":12.25652439306657,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"hyperkalaemia","report_count":5,"llr":8.287317387302323,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"hyponatraemia","report_count":7,"llr":11.382816665432415,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"hypotension","report_count":10,"llr":7.6615341020948335,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"metabolic acidosis","report_count":4,"llr":6.988774571870408,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"obstructive airways disorder","report_count":3,"llr":8.862418298563739,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"patent ductus arteriosus","report_count":2,"llr":6.464608951968216,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"respiratory distress","report_count":3,"llr":6.317005795028763,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"tension","report_count":2,"llr":6.905058210629818,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL1168","event":"urinary hesitation","report_count":3,"llr":10.912949094889768,"critval":6.265254024663793}
+{"chembl_id":"CHEMBL128","event":"microcephaly","report_count":2,"llr":13.403898666326413,"critval":12.055730735863886}
+{"chembl_id":"CHEMBL128","event":"pulmonary artery stenosis","report_count":2,"llr":12.593365151818837,"critval":12.055730735863886}
+{"chembl_id":"CHEMBL2107830","event":"diabetic ketoacidosis","report_count":5,"llr":20.796217903588456,"critval":9.07707794933296}
+{"chembl_id":"CHEMBL2107830","event":"heat illness","report_count":2,"llr":10.394600931223678,"critval":9.07707794933296}
+{"chembl_id":"CHEMBL1201589","event":"abdominal pain upper","report_count":6,"llr":5.9023447568274605,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"anaphylactic shock","report_count":3,"llr":8.652301471058024,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"anxiety","report_count":5,"llr":6.207596093769041,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"aphonia","report_count":6,"llr":22.578735307228783,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"arthralgia","report_count":8,"llr":9.255366715856894,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"asthenia","report_count":6,"llr":5.751837985465329,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"asthma","report_count":36,"llr":150.17132912766067,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"asthmatic crisis","report_count":3,"llr":13.278256315669637,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"back pain","report_count":6,"llr":7.087021893503049,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"blood immunoglobulin e increased","report_count":2,"llr":8.600706457403476,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"blood pressure increased","report_count":13,"llr":32.07418278844489,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"blood pressure systolic increased","report_count":9,"llr":32.11884711712139,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"body temperature decreased","report_count":4,"llr":13.37814812361188,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"body temperature increased","report_count":3,"llr":10.00826979024447,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"breath sounds abnormal","report_count":4,"llr":16.12533425979575,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"bronchitis","report_count":8,"llr":18.5162132914096,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"cellulitis","report_count":4,"llr":7.92679671424213,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"chest discomfort","report_count":5,"llr":9.015532658806137,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"contusion","report_count":6,"llr":12.906809945534519,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"cough","report_count":19,"llr":43.49830797197927,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"dysphonia","report_count":4,"llr":8.563173161202485,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"dyspnoea","report_count":27,"llr":54.96164661227618,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"dyspnoea exertional","report_count":5,"llr":10.590048169311387,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"eczema","report_count":3,"llr":7.6239801514140595,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"eosinophil count increased","report_count":3,"llr":10.54877077631943,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"erythema","report_count":4,"llr":5.531444279206596,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"eye pruritus","report_count":3,"llr":9.552282168121508,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"facial pain","report_count":2,"llr":6.215774765103845,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"fall","report_count":8,"llr":9.340919662678743,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"fatigue","report_count":17,"llr":19.41717853682991,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"feeling abnormal","report_count":5,"llr":6.457086343127855,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"feeling hot","report_count":3,"llr":6.279670341182282,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"forced expiratory volume decreased","report_count":8,"llr":32.53300965648822,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"headache","report_count":18,"llr":27.20125466955949,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"heart rate increased","report_count":11,"llr":34.47395419961458,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"hypersensitivity","report_count":9,"llr":17.98246632339459,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"hypoventilation","report_count":2,"llr":7.224274085141758,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"influenza","report_count":14,"llr":38.65773696222283,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"injection site erythema","report_count":3,"llr":6.279670341182282,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"injection site pain","report_count":8,"llr":17.672312908458366,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"insomnia","report_count":10,"llr":21.329403785746536,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"intervertebral disc protrusion","report_count":3,"llr":8.358518079736996,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"ligament sprain","report_count":2,"llr":5.857708733793174,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"limb injury","report_count":5,"llr":16.76543371055419,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"loss of consciousness","report_count":5,"llr":8.60868974466672,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"lower respiratory tract congestion","report_count":2,"llr":7.585629682787214,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"lower respiratory tract infection","report_count":8,"llr":21.832484058757927,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"lung disorder","report_count":4,"llr":9.420744382110968,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"lung infection","report_count":4,"llr":10.656399168822247,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"malaise","report_count":22,"llr":36.97807603816648,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"middle insomnia","report_count":2,"llr":6.919260427780955,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"migraine","report_count":4,"llr":8.106254385157513,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"mobility decreased","report_count":3,"llr":5.849870194846403,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"mouth swelling","report_count":2,"llr":6.215774765103845,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"myalgia","report_count":5,"llr":5.462715731707533,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"nasal congestion","report_count":7,"llr":19.601023655031838,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"nasal discharge discolouration","report_count":2,"llr":9.408349716604391,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"nasal obstruction","report_count":2,"llr":6.919260427780955,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"nasopharyngitis","report_count":21,"llr":55.17160224590526,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"obstructive airways disorder","report_count":3,"llr":10.54877077631943,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"oedema peripheral","report_count":6,"llr":10.855900841423477,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"oropharyngeal pain","report_count":9,"llr":21.933239319559164,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"oxygen saturation decreased","report_count":6,"llr":16.594951174327605,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"pain","report_count":9,"llr":9.362844783933667,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"pain in extremity","report_count":7,"llr":8.195197538462537,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"peripheral swelling","report_count":7,"llr":11.172636689788135,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"pharyngitis streptococcal","report_count":2,"llr":7.585629682787214,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"pneumonia","report_count":15,"llr":26.008298088818094,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"post procedural infection","report_count":2,"llr":6.215774765103845,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"productive cough","report_count":12,"llr":40.99270625715144,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"pruritus","report_count":10,"llr":15.136443717208067,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"pyrexia","report_count":10,"llr":12.747227924373476,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"rales","report_count":3,"llr":13.278256315669637,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"red cell distribution width increased","report_count":2,"llr":6.65548553119811,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"respiratory disorder","report_count":3,"llr":7.130459219585305,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"respiratory rate increased","report_count":5,"llr":19.29460720100684,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"respiratory tract infection","report_count":3,"llr":7.130459219585305,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"rhinorrhoea","report_count":5,"llr":11.087132874041913,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"rotator cuff syndrome","report_count":2,"llr":6.4232075349451065,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"rubber sensitivity","report_count":2,"llr":8.600706457403476,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"seasonal allergy","report_count":8,"llr":31.167055903753692,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"sensitivity to weather change","report_count":3,"llr":12.612056313242647,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"sepsis","report_count":5,"llr":8.081172234219025,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"sinusitis","report_count":10,"llr":24.416936790931743,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"sputum discoloured","report_count":7,"llr":28.403472721324363,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"sputum retention","report_count":2,"llr":9.408349716604391,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"stress","report_count":10,"llr":29.49756744829932,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"upper-airway cough syndrome","report_count":3,"llr":10.266071987438806,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"urticaria","report_count":8,"llr":17.74517863036607,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"viral infection","report_count":4,"llr":11.040623487297808,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"vocal cord dysfunction","report_count":2,"llr":9.408349716604391,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"weight decreased","report_count":19,"llr":39.76883936202927,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"weight increased","report_count":9,"llr":16.429085918347653,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"wheezing","report_count":11,"llr":40.607651740350946,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL1201589","event":"wrist fracture","report_count":2,"llr":6.65548553119811,"critval":5.364708659352404}
+{"chembl_id":"CHEMBL716","event":"aggression","report_count":4,"llr":8.004756863754096,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"blood bicarbonate increased","report_count":2,"llr":8.114699326722757,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"brugada syndrome","report_count":2,"llr":8.114699326722757,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"coma","report_count":5,"llr":9.614351995546372,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"diabetes mellitus","report_count":8,"llr":18.4206330472922,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"drug abuse","report_count":5,"llr":7.307058722307261,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"drug interaction","report_count":11,"llr":11.570801515329208,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"hypertonia neonatal","report_count":2,"llr":8.114699326722757,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"mania","report_count":3,"llr":7.633117579275563,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"metabolic alkalosis","report_count":2,"llr":6.741099780011382,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"neonatal hypoxia","report_count":2,"llr":8.114699326722757,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"neuroleptic malignant syndrome","report_count":4,"llr":11.92010038319404,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"restless legs syndrome","report_count":3,"llr":6.748450383718364,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"sedation","report_count":4,"llr":7.891589866247955,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"somnolence","report_count":9,"llr":10.600428423479798,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"sopor","report_count":4,"llr":6.677656952730217,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"suicide attempt","report_count":12,"llr":27.75983180957303,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"toxicity to various agents","report_count":7,"llr":7.151568868746722,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL716","event":"urinary hesitation","report_count":5,"llr":20.35307081527924,"critval":6.291048750193827}
+{"chembl_id":"CHEMBL870","event":"atypical femur fracture","report_count":4,"llr":14.9110558295867,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"basal cell carcinoma","report_count":3,"llr":6.804649080176603,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"blood cholesterol increased","report_count":3,"llr":6.399014421072195,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"bursitis","report_count":3,"llr":9.31016099368901,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"coma","report_count":4,"llr":9.015911970013008,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"depression","report_count":8,"llr":13.714540840218831,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"fall","report_count":7,"llr":6.813671003682089,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"femur fracture","report_count":14,"llr":53.76132790513935,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"gastrooesophageal reflux disease","report_count":9,"llr":20.736630169126727,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"glossodynia","report_count":2,"llr":6.495046931944444,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"hand fracture","report_count":3,"llr":11.364995873103851,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"hip arthroplasty","report_count":2,"llr":6.055903091413484,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"hyperlipidaemia","report_count":4,"llr":12.58758298240707,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"inflammation","report_count":3,"llr":6.475498535419035,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"intervertebral disc degeneration","report_count":2,"llr":6.263052390437963,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"intramedullary rod insertion","report_count":4,"llr":18.555471633704315,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"joint dislocation","report_count":2,"llr":6.055903091413484,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"low turnover osteopathy","report_count":4,"llr":18.555471633704315,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"osteoarthritis","report_count":5,"llr":12.836273862235316,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"osteoma","report_count":2,"llr":8.43885082540686,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"osteonecrosis","report_count":5,"llr":16.11340597552919,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"osteoporosis","report_count":3,"llr":7.178206962868558,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"pemphigus","report_count":3,"llr":11.364995873103851,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"pneumonia aspiration","report_count":4,"llr":11.29779160349915,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"spinal fracture","report_count":3,"llr":8.261235362348714,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"spinal laminectomy","report_count":2,"llr":9.246210726244442,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"stress fracture","report_count":2,"llr":7.063268624598436,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"systemic lupus erythematosus","report_count":3,"llr":8.916599084863947,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"thoracic vertebral fracture","report_count":6,"llr":25.50710851755838,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"tooth disorder","report_count":3,"llr":8.916599084863947,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"tooth extraction","report_count":3,"llr":8.916599084863947,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"tooth infection","report_count":2,"llr":6.055903091413484,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL870","event":"vitamin d deficiency","report_count":4,"llr":13.306490058606414,"critval":6.044857676222214}
+{"chembl_id":"CHEMBL46740","event":"abdominal distension","report_count":4,"llr":8.720220718270895,"critval":8.686680939516211}
+{"chembl_id":"CHEMBL46740","event":"endometrial thickening","report_count":2,"llr":10.339243211408274,"critval":8.686680939516211}
+{"chembl_id":"CHEMBL46740","event":"postmenopausal haemorrhage","report_count":2,"llr":8.957029326348248,"critval":8.686680939516211}
+{"chembl_id":"CHEMBL70418","event":"sedation","report_count":3,"llr":13.03899466874531,"critval":12.258921467412932}
+{"chembl_id":"CHEMBL862","event":"brugada syndrome","report_count":2,"llr":14.351829446942737,"critval":12.094127552425142}
+{"chembl_id":"CHEMBL1404","event":"ejection fraction decreased","report_count":1,"llr":5.559833782529701,"critval":4.730734061776253}
+{"chembl_id":"CHEMBL1404","event":"electrocardiogram t wave inversion","report_count":1,"llr":7.699049533524681,"critval":4.730734061776253}
+{"chembl_id":"CHEMBL1404","event":"sinus bradycardia","report_count":1,"llr":5.559833782529701,"critval":4.730734061776253}
+{"chembl_id":"CHEMBL1404","event":"ventricular fibrillation","report_count":1,"llr":5.827870921734988,"critval":4.730734061776253}
+{"chembl_id":"CHEMBL2048484","event":"aspartate aminotransferase decreased","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"blood ketone body increased","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"diabetic ketoacidosis","report_count":2,"llr":7.126921082145856,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"diabetic ulcer","report_count":2,"llr":12.590508507592233,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"genital candidiasis","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"genital infection","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"genital infection fungal","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"low density lipoprotein abnormal","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"neuropathic arthropathy","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"seborrhoeic dermatitis","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"vulvitis","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2048484","event":"vulvovaginitis","report_count":1,"llr":6.253595874949909,"critval":5.9084156895238635}
+{"chembl_id":"CHEMBL2105760","event":"compulsive shopping","report_count":1,"llr":6.600663950819909,"critval":5.573423464587326}
+{"chembl_id":"CHEMBL2105760","event":"muscle twitching","report_count":1,"llr":5.620401687674253,"critval":5.573423464587326}
+{"chembl_id":"CHEMBL2105760","event":"post-traumatic stress disorder","report_count":1,"llr":7.293641097089196,"critval":5.573423464587326}
+{"chembl_id":"CHEMBL2105760","event":"salivary hypersecretion","report_count":1,"llr":5.907856925600848,"critval":5.573423464587326}
+{"chembl_id":"CHEMBL2105760","event":"schizophrenia","report_count":1,"llr":5.994811601997942,"critval":5.573423464587326}
+{"chembl_id":"CHEMBL2105760","event":"tardive dyskinesia","report_count":1,"llr":5.994811601997942,"critval":5.573423464587326}
+{"chembl_id":"CHEMBL1771","event":"acid base balance abnormal","report_count":2,"llr":9.215313201780418,"critval":7.696801633082809}
+{"chembl_id":"CHEMBL1771","event":"diabetic macroangiopathy","report_count":2,"llr":9.215313201780418,"critval":7.696801633082809}
+{"chembl_id":"CHEMBL1771","event":"extremity necrosis","report_count":2,"llr":7.836273020322551,"critval":7.696801633082809}
+{"chembl_id":"CHEMBL1771","event":"hyperhidrosis","report_count":5,"llr":8.45967593656951,"critval":7.696801633082809}
+{"chembl_id":"CHEMBL1771","event":"intermittent claudication","report_count":3,"llr":12.32078271911314,"critval":7.696801633082809}
+{"chembl_id":"CHEMBL1771","event":"melaena","report_count":4,"llr":9.313725603231092,"critval":7.696801633082809}
+{"chembl_id":"CHEMBL656","event":"acidosis","report_count":2,"llr":7.393613315887137,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"cholestasis","report_count":3,"llr":6.940044672618285,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"coma","report_count":3,"llr":5.872103998276316,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"constipation","report_count":6,"llr":5.521939177225079,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"drug withdrawal syndrome","report_count":3,"llr":6.759636190237757,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"hepatocellular injury","report_count":6,"llr":15.500491586485111,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"hypertensive emergency","report_count":2,"llr":7.032597806097783,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"night sweats","report_count":3,"llr":8.072688205856139,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"pneumonia aspiration","report_count":3,"llr":7.563925916823621,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"premature baby","report_count":3,"llr":7.13296701951441,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"respiratory depression","report_count":2,"llr":6.232551635144546,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"sedation","report_count":3,"llr":6.673653899614521,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL656","event":"toxicity to various agents","report_count":9,"llr":15.947935102021233,"critval":4.956754644199034}
+{"chembl_id":"CHEMBL1083659","event":"nightmare","report_count":2,"llr":9.853101271714976,"critval":7.565190178423158}
+{"chembl_id":"CHEMBL1201231","event":"adrenal insufficiency","report_count":4,"llr":8.012379536997173,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"aplasia pure red cell","report_count":3,"llr":7.508830037963548,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"cushingoid","report_count":5,"llr":13.049229082930992,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"cytomegalovirus infection","report_count":7,"llr":13.963523524082575,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"diabetes mellitus","report_count":5,"llr":6.438898261336362,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"escherichia bacteraemia","report_count":3,"llr":8.8841499979751,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"febrile neutropenia","report_count":8,"llr":7.69895811432923,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"gastrointestinal wall thickening","report_count":2,"llr":6.124931887914727,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"hypofibrinogenaemia","report_count":3,"llr":7.508830037963548,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"intestinal tuberculosis","report_count":2,"llr":6.924244411231825,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"legionella infection","report_count":2,"llr":6.924244411231825,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"leukopenia","report_count":7,"llr":6.702748196056746,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"nocardiosis","report_count":3,"llr":6.3386984625617515,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"osteonecrosis","report_count":5,"llr":10.354261054944459,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"parvovirus infection","report_count":3,"llr":9.54201832017759,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"pneumocystis jirovecii pneumonia","report_count":7,"llr":17.11735552891946,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"premature baby","report_count":4,"llr":6.231381882496976,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"renal and pancreas transplant rejection","report_count":3,"llr":10.393502861086745,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"squamous cell carcinoma of the tongue","report_count":3,"llr":10.393502861086745,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1201231","event":"strongyloidiasis","report_count":3,"llr":6.86252994700294,"critval":6.1177224934393495}
+{"chembl_id":"CHEMBL1218","event":"wrong technique in product usage process","report_count":4,"llr":13.28989911139162,"critval":10.199350407497626}

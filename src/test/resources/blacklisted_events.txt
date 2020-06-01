@@ -1,0 +1,183 @@
+accidental drug intake by child
+accidental exposure to product
+accidental exposure
+accidental overdose
+accidental underdose
+adenotonsillectomy
+adverse drug reaction
+adverse event
+adverse reaction
+analgesic drug level increased
+anticoagulation drug level above therapeutic
+anticoagulation drug level below therapeutic
+anticonvulsant drug level above therapeutic
+anticonvulsant drug level increased
+antipsychotic drug level above therapeutic
+antipsychotic drug level below therapeutic
+antipsychotic drug level decreased
+antipsychotic drug level increased
+antiviral drug level below therapeutic
+cardioactive drug level above therapeutic
+cardioactive drug level below therapeutic
+cardioactive drug level decreased
+cardioactive drug level increased
+cardioactive drug level
+catheter management
+catheter placement
+catheter site discharge
+catheter site erythema
+catheter site haematoma
+catheter site haemorrhage
+catheter site infection
+catheter site inflammation
+catheter site pain
+catheter site pruritus
+catheter site rash
+catheter site swelling
+central venous catheterisation
+cerebrospinal fluid reservoir placement
+chemotherapy
+circumstance or information capable of leading to medication error
+complication associated with device
+complication of delivery
+complication of device insertion
+complication of device removal
+complications of transplanted kidney
+contraindicated product administered
+crossmatch incompatible
+device alarm issue
+device breakage
+device deployment issue
+device difficult to use
+device dislocation
+device expulsion
+device failure
+device issue
+device kink
+device leakage
+device malfunction
+device occlusion
+device related infection
+device related sepsis
+diet noncompliance
+drug administered at inappropriate site
+drug administered to patient of inappropriate age
+drug administration error
+drug dispensing error
+drug dose omission by device
+drug dose omission
+drug effect decreased
+drug effect delayed
+drug effect incomplete
+drug effect increased
+drug effect prolonged
+drug effect variable
+drug eruption
+drug exposure before pregnancy
+drug exposure during pregnancy
+drug ineffective for unapproved indication
+drug ineffective
+drug level above therapeutic
+drug level decreased
+drug level increased
+drug prescribing error
+ectopic pregnancy with contraceptive device
+embedded device
+event
+expired product administered
+exposed bone in jaw
+exposure during breast feeding
+exposure during pregnancy
+exposure via body fluid
+feeding tube complication
+foetal exposure during delivery
+foetal exposure during pregnancy
+forceps delivery
+foreign body in reproductive tract
+foreign body trauma
+gastrostomy tube insertion
+inadequate aseptic technique in use of product
+inappropriate antidiuretic hormone secretion
+inappropriate schedule of drug administration
+inappropriate schedule of product administration
+incorrect disposal of product
+incorrect dose administered by device
+incorrect dose administered
+incorrect drug administration duration
+incorrect drug administration rate
+incorrect product storage
+incorrect route of drug administration
+incorrect route of product administration
+intentional dose omission
+intentional drug misuse
+intentional misuse
+intentional overdose
+intentional product misuse
+intentional product use issue
+intentional self-injury
+intentional underdose
+intercepted medication error
+intercepted product storage error
+investigation
+maternal exposure before pregnancy
+maternal exposure during breast feeding
+maternal exposure during delivery
+maternal exposure during pregnancy
+mechanical ventilation complication
+mechanical ventilation
+medical device complication
+medical device discomfort
+medical device removal
+medication error
+medication overuse headache
+medication residue present
+medication residue
+multiple drug overdose intentional
+multiple drug overdose
+multiple use of single-use product
+no adverse drug effect
+no adverse effect
+no adverse event
+off label use
+overdose
+pacemaker generated rhythm
+prescribed overdose
+prescribed underdose
+product adhesion issue
+product administered to patient of inappropriate age
+product administration error
+product administration interrupted
+product container issue
+product dosage form confusion
+product dose omission
+product dropper issue
+product formulation issue
+product packaging quantity issue
+product physical consistency issue
+product physical issue
+product preparation error
+product prescribing error
+product quality issue
+product size issue
+product solubility abnormal
+product storage error
+product substitution issue
+product supply issue
+product taste abnormal
+product use complaint
+product use in unapproved indication
+product use issue
+product used for unknown indication
+road traffic accident
+self-medication
+surgical procedure repeated
+therapeutic drug monitoring analysis incorrectly performed
+therapy cessation
+thrombosis in device
+tracheostomy malfunction
+transmission of drug via semen
+treatment noncompliance
+underdose
+vascular operation
+wrong technique in drug usage process
+walking aid user
