@@ -34,8 +34,15 @@ object OpenFdaEtl extends LazyLogging {
 
     val groupedByIds = prepareSummaryStatistics(fdaDataFilteredByBlackListAndJoinedWithDrug)
 
-    prepareForMonteCarlo(groupedByIds)
+    val results = prepareForMonteCarlo(groupedByIds)
 
+    if (etLSessionContext.configuration.fda.sampling.enabled) {
+      logger.info("Generating stratified sample")
+      StratifiedSampling(fdaData, fdaData, results)
+
+    }
+
+    results
   }
 
   private def filterBlacklist(blacklistPath: String, df: DataFrame)(
