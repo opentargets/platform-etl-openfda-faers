@@ -12,7 +12,10 @@ object Loaders extends LazyLogging {
     logger.info("Loading ChEMBL drug list...")
     val drugList = ss.read
       .json(path)
-      .selectExpr("id as chembl_id", "synonyms", "pref_name", "trade_names")
+      .selectExpr("_source.id as chembl_id",
+                  "_source.synonyms as synonyms",
+                  "_source.pref_name pref_name",
+                  "_source.trade_names as trade_names")
       .withColumn("drug_names",
                   array_distinct(
                     flatten(array(col("trade_names"), array(col("pref_name")), col("synonyms")))))

@@ -4,13 +4,13 @@ import com.typesafe.scalalogging.LazyLogging
 import io.opentargets.openfda.config.ETLSessionContext
 import io.opentargets.openfda.stage.{MonteCarloSampling, OpenFdaEtl}
 import io.opentargets.openfda.utils.Writers
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.storage.StorageLevel
 
 object ETL extends LazyLogging {
 
   def applySingleStep(step: String)(implicit context: ETLSessionContext): Unit = {
-
+    implicit val sc: SparkSession = context.sparkSession
     step match {
       case "fda" =>
         logger.info("run step fda pipeline...")
@@ -37,6 +37,7 @@ object ETL extends LazyLogging {
                                            context.configuration.common.output,
                                            extension)
           }
+
         }
 
         logger.info("All FDA stages complete.")
