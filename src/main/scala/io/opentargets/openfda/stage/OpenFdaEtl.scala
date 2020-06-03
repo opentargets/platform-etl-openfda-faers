@@ -6,6 +6,7 @@ import io.opentargets.openfda.utils.Loaders
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.storage.StorageLevel
 
 /**
   * Extract key information from the FDA dataset.
@@ -24,8 +25,8 @@ object OpenFdaEtl extends LazyLogging {
     // load inputs
     // the curated drug list we want
     val drugList: DataFrame = generateDrugList(chemblPath)
-
-    val fdaData = prepareAdverseEventsData(fdaPath)
+    val fdaRawData = Loaders.loadFDA(fdaPath)
+    val fdaData = prepareAdverseEventsData(fdaRawData)
 
     // remove blacklisted reactions using a left_anti which is the complement of
     // left_semi so the ones from the left side which are not part of the equality
@@ -34,11 +35,11 @@ object OpenFdaEtl extends LazyLogging {
 
     val groupedByIds = prepareSummaryStatistics(fdaDataFilteredByBlackListAndJoinedWithDrug)
 
-    val results = prepareForMonteCarlo(groupedByIds)
+    val results = prepareForMonteCarlo(groupedByIds).persist(StorageLevel.MEMORY_AND_DISK_SER)
 
     if (etLSessionContext.configuration.fda.sampling.enabled) {
       logger.info("Generating stratified sample")
-      StratifiedSampling(fdaData, fdaData, results)
+      StratifiedSampling(groupedByIds, results)
 
     }
 
@@ -52,11 +53,10 @@ object OpenFdaEtl extends LazyLogging {
 
   }
 
-  private def prepareAdverseEventsData(path: String)(
+  private def prepareAdverseEventsData(fdaData: DataFrame)(
       implicit sparkSession: SparkSession): DataFrame = {
     import sparkSession.implicits._
-    val adverseEventReports = Loaders.loadFDA(path)
-    val fdasF = adverseEventReports
+    val fdasF = fdaData
       .withColumn("reaction", explode(col("patient.reaction")))
       // after explode this we will have reaction-drug pairs
       .withColumn("drug", explode(col("patient.drug")))

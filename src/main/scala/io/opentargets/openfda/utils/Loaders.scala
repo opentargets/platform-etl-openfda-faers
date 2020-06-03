@@ -24,7 +24,10 @@ object Loaders extends LazyLogging {
     drugList
   }
 
-  /** load initial OpenFDA FAERS json-lines and preselect needed fields  */
+  /** load initial OpenFDA FAERS json-lines and preselect needed fields
+    * @param path file directory containing raw-fda data
+    * @return fda data with only the columns needed for pipeline analysis
+    */
   def loadFDA(path: String)(implicit ss: SparkSession): DataFrame = {
 
     logger.info("Loading FDA database json...")

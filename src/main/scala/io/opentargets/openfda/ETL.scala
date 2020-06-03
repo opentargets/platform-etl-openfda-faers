@@ -17,7 +17,7 @@ object ETL extends LazyLogging {
         val fdaConfig = context.configuration.fda
         logger.info("Aggregating FDA data...")
         val openFdaDataAggByChembl: DataFrame =
-          OpenFdaEtl(context).persist(StorageLevel.MEMORY_AND_DISK_SER)
+          OpenFdaEtl(context)
 
         logger.info("Performing Monte Carlo sampling...")
         val mcResults =
