@@ -5,7 +5,7 @@ lazy val root = (project in file("."))
       scalaVersion := "2.12.10",
     )),
     name := "openfda",
-    version := "0.1.2",
+    version := "1.0.0",
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
     javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled", "-Dlogback.configurationFile=logback.xml"),
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
