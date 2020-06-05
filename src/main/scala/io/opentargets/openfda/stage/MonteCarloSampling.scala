@@ -41,10 +41,10 @@ object MonteCarloSampling {
 
     val exprs = List(
       "chembl_id",
-      "reaction_reactionmeddrapt as event",
+      "reaction_reactionmeddrapt as name",
       "A as count",
-      "llr",
-      "critVal_drug as critval"
+      "llr as logLR",
+      "critVal_drug as criticalValue"
     )
 
     val filteredDF = inputDf
