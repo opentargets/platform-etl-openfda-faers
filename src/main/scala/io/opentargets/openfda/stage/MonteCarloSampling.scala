@@ -42,7 +42,7 @@ object MonteCarloSampling {
     val exprs = List(
       "chembl_id",
       "reaction_reactionmeddrapt as event",
-      "A as report_count",
+      "A as count",
       "llr",
       "critVal_drug as critval"
     )

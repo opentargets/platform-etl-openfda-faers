@@ -25,7 +25,7 @@ for fname in $(ls -1 f_*); do
             # -r raw json, no escapes
             # @json = output in json format
         # uuidgen -r = create random uuid
-        wget -c "$f" -O - | gunzip | jq -r '.results[]|@json' > $(uuidgen -r)"_file.json"; 
+        wget -c "$f" -O - | gunzip | jq -r '.results[]|@json' > $(uuidgen -r)"_file.jsonl";
         done
     ) &
 done
