@@ -1,6 +1,6 @@
 package io.opentargets.openfda.utils
 
-import io.opentargets.openfda.config.{Configuration, Fda, FdaInputs, MonteCarlo}
+import io.opentargets.openfda.config._
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -16,13 +16,16 @@ class FdaConfigurationTest extends AnyFlatSpecLike with Matchers {
 
   "Fda config" should "not accept invalid output formats" in {
     a[IllegalArgumentException] should be thrownBy {
-      Fda(MonteCarlo(1, .04), FdaInputs(".txt", "json", "jsonl"), Seq("csv", "txt"))
+      Fda(MonteCarlo(1, .04), FdaInputs(".txt", "json", "jsonl"), Seq("csv", "txt"), Sampling(""))
     }
   }
 
   "Fda config" should "accept output formats" in {
     val fdaConfig =
-      Fda(MonteCarlo(1, .04), FdaInputs(".txt", "json", "jsonl"), Seq("csv", "json", "jsonl"))
+      Fda(MonteCarlo(1, .04),
+          FdaInputs(".txt", "json", "jsonl"),
+          Seq("csv", "json", "jsonl"),
+          Sampling(""))
     assert(fdaConfig.outputs.length.equals(3))
   }
 

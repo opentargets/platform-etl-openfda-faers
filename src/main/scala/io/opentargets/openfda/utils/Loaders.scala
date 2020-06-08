@@ -12,10 +12,10 @@ object Loaders extends LazyLogging {
     logger.info("Loading ChEMBL drug list...")
     val drugList = ss.read
       .json(path)
-      .selectExpr("_source.id as chembl_id",
-                  "_source.synonyms as synonyms",
-                  "_source.pref_name pref_name",
-                  "_source.trade_names as trade_names")
+      .selectExpr("id as chembl_id",
+                  "synonyms as synonyms",
+                  "pref_name pref_name",
+                  "trade_names as trade_names")
       .withColumn("drug_names",
                   array_distinct(
                     flatten(array(col("trade_names"), array(col("pref_name")), col("synonyms")))))
@@ -27,7 +27,10 @@ object Loaders extends LazyLogging {
     drugList
   }
 
-  /** load initial OpenFDA FAERS json-lines and preselect needed fields  */
+  /** load initial OpenFDA FAERS json-lines and preselect needed fields
+    * @param path file directory containing raw-fda data
+    * @return fda data with only the columns needed for pipeline analysis
+    */
   def loadFDA(path: String)(implicit ss: SparkSession): DataFrame = {
 
     logger.info("Loading FDA database json...")

@@ -213,6 +213,23 @@ in a single file the following command can be used:
 
 `touch results.jsonl; find <directory with results> -name 'part*.json' -exec cat {} \; >> results.jsonl `
 
+### Sampling
+
+As the FAERS database is very large (~130GB) it might be useful to extract a stratified sample for analysis and testing
+purposes. There is a feature provided to achieve this which is configured through the `application.conf` file to be
+provided to Spark. 
+
+> Caution: Execution of the job will be very slow with sampling enabled because of the large amount of 
+> data which needs to be written to disk!
+
+The sampling method will return a subset of the original data, with equal proportions of drugs which likely would have
+had significant results during MC sampling and those that did not. For instance, if there are 6000 unique ChEMBL entries
+in the entire dataset, and 500 would have had significant adverse effects, and sampling is set to 0.10, we would expect
+that the sampled data would ahve around 600 ChEMBL entries, of which 50 may be significant. As the sampling is random, 
+and the significance of an adverse event depends both on the number of adverse events and drugs in a sample, results are 
+not reproducible. Sampling is provided for basic validation and testing. 
+
+The sampled dataset is saved to disk, and can be used as an input for subsequent jobs.  
 
 # Copyright
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute

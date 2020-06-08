@@ -12,15 +12,21 @@ case class FdaInputs(
     chemblData: String,
     fdaData: String
 ) {
-  require(blacklist.endsWith("txt"))
-  require(chemblData.endsWith("json"))
-  require(fdaData.endsWith("jsonl"))
+  require(blacklist.endsWith("txt"), "Blacklist is required in txt extension")
+  require(chemblData.endsWith("json"), "ChEMBL data is required in json format")
+  require(fdaData.endsWith("jsonl"), "FDA data is required in jsonl format")
+}
+case class Sampling(output: String, size: Double = 0.1, enabled: Boolean = false) {
+  require(size > 0)
 }
 case class MonteCarlo(permutations: Int, percentile: Double) {
   require(permutations > 0)
   require(percentile > 0 && percentile < 1)
 }
-case class Fda(montecarlo: MonteCarlo, fdaInputs: FdaInputs, outputs: Seq[String]) {
+case class Fda(montecarlo: MonteCarlo,
+               fdaInputs: FdaInputs,
+               outputs: Seq[String],
+               sampling: Sampling) {
   private def validOutput(str: String): Boolean = List("csv", "json", "jsonl").contains(str)
   require(outputs.forall(validOutput))
 }

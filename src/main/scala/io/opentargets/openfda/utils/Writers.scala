@@ -1,9 +1,7 @@
 package io.opentargets.openfda.utils
 
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.hadoop.fs.{FileStatus, FileSystem, Path}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.joda.time.DateTime
 
 object Writers extends LazyLogging {
 
@@ -21,15 +19,6 @@ object Writers extends LazyLogging {
           .option("compression", "gzip")
           .option("header", "true")
           .csv(s"$outputPath/agg_critval_drug_csv/")
-        // rename to sensible output if possible.
-        val fs = FileSystem
-          .get(sparkSession.sparkContext.hadoopConfiguration)
-        val fileToRename: Option[FileStatus] = Option(
-          fs.globStatus(new Path(s"${fileName}part-00*.csv.gz")).head)
-        fileToRename.map(f => {
-          fs.rename(f.getPath,
-                    new Path(s"${fileName}adverse-events-${DateTime.now.toLocalDate}.csv.gz"))
-        })
 
       case "json" =>
         logger.info("Writing monte carlo results as json output...")
