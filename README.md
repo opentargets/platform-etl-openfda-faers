@@ -2,7 +2,14 @@
 
 OpenTargets ETL pipeline to process OpenFDA FAERS DB. 
 
-The openFDA drug adverse event API returns data that has been collected from the FDA Adverse Event Reporting System (FAERS), a database that contains information on adverse event and medication error reports submitted to FDA.
+The openFDA drug adverse event API returns data that has been collected from the FDA Adverse Event Reporting System (FAERS), 
+a database that contains information on adverse event and medication error reports submitted to FDA.
+
+The pipeline supports two output formats (CSV and JSON) which can be specified in the configuration file. For Open Targets,
+both formats are used:
+
+- CSV: adverse_event in the current pipeline
+- JSON: openfda index in the ETL pipeline
 
 This project should be run as a Spark job to generate aggregate outputs of adverse drug events.
 
@@ -21,6 +28,30 @@ This project should be run as a Spark job to generate aggregate outputs of adver
         - openFDA adverse event data fields: *‘drug.medicinalproduct’, ‘drug.openfda.generic_name’, ‘drug.openfda.brand_name’, ‘drug.openfda.substance_name’*.
     - Generate table where each row is a unique drug-event pair and count the number of report IDs for each pair, the total number of reports, the total number of reports per drug and the total number of reports per event. Using these calculate the fields required for estimating the significance of each event occuring for each drug, e.g. log-likelihood ratio, (llr) (based on [FDA LRT method](https://openfda.shinyapps.io/LRTest/_w_c5c2d04d/lrtmethod.pdf)).
 3. __Stage 2:__ Calculate significance of each event for all drugs based on the FDA LRT method (Monte Carlo simulation) (MonteCarloSampling.scala). 
+
+
+### Sample output
+
+Sample CSV output:
+
+```
+chembl_id,event,count,llr,critval
+CHEMBL1231,cardiac output decreased,1,8.392140045623442,4.4247991585588675
+CHEMBL1231,cardiovascular insufficiency,1,7.699049533524681,4.4247991585588675
+CHEMBL888,acute kidney injury,9,6.599656934149834,6.04901361282136
+CHEMBL888,adenocarcinoma pancreas,2,6.557801342905918,6.04901361282136
+CHEMBL888,anaemia,10,8.200182769578191,6.04901361282136
+```
+
+Sample JSON output:
+
+```
+{"chembl_id":"CHEMBL1231","event":"cardiac output decreased","count":1,"llr":8.392140045623442,"critval":4.4247991585588675}
+{"chembl_id":"CHEMBL1231","event":"cardiovascular insufficiency","count":1,"llr":7.699049533524681,"critval":4.4247991585588675}
+```
+
+Notice that the JSON output is actually JSONL. Each line is a single result object. 
+
 
 ### Requirements
 
@@ -230,6 +261,13 @@ and the significance of an adverse event depends both on the number of adverse e
 not reproducible. Sampling is provided for basic validation and testing. 
 
 The sampled dataset is saved to disk, and can be used as an input for subsequent jobs.  
+
+# Versioning
+
+| Version | Date | Notes |
+| --- | --- | --- |
+| 1.0.0 | June 2020 | Initial release | 
+| 1.0.1 | September 2020 | Fixing output names; headers for CSV, keys for JSON | 
 
 # Copyright
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
