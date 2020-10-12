@@ -61,4 +61,20 @@ object Loaders extends LazyLogging {
       .orderBy(col("reactions").asc)
   }
 
+  /*
+   * The MedDRA raw data comes in a $ separated value format. There are large number of null fields that we're not
+   * interested which we want to discard. This method cleans the data and returns a usable dataframe.
+   * @return DataFrame with columns: ptCode, ptName. Code is meddra identifier, ptName is reaction in Fda data.
+   */
+  def loadMeddraPreferredTerms(path: String)(implicit ss: SparkSession): DataFrame = {
+    val cols = Seq("ptCode", "ptName").zipWithIndex
+    val meddraRaw = ss.read.csv(path)
+    meddraRaw
+      .withColumn("_c0", regexp_replace(col("_c0"), "\\$+", ","))
+      .withColumn("_c0", regexp_replace(col("_c0"), "\\$$", ""))
+      .withColumn("_c0", split(col("_c0"), ","))
+      .select(cols.map(i => col("_c0").getItem(i._2).as(s"${i._1}")): _*)
+      .withColumn("ptName", lower(col("ptName")))
+  }
+
 }
