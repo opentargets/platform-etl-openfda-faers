@@ -35,15 +35,16 @@ object OpenFdaEtl extends LazyLogging {
 
     val groupedByIds = prepareSummaryStatistics(fdaDataFilteredByBlackListAndJoinedWithDrug)
 
-    val results = prepareForMonteCarlo(groupedByIds).persist(StorageLevel.MEMORY_AND_DISK_SER)
+    val results = prepareForMonteCarlo(groupedByIds)
+
+    val resultsWithMeddra =
+      addMedDraPreferredTerms(results).persist(StorageLevel.MEMORY_AND_DISK_SER)
 
     if (etLSessionContext.configuration.fda.sampling.enabled) {
       logger.info("Generating stratified sample")
-      StratifiedSampling(groupedByIds, results)
-
+      StratifiedSampling(groupedByIds, resultsWithMeddra)
     }
-
-    results
+    resultsWithMeddra
   }
 
   private def filterBlacklist(blacklistPath: String, df: DataFrame)(
@@ -154,5 +155,17 @@ object OpenFdaEtl extends LazyLogging {
   private def generateDrugList(chemblPath: String)(
       implicit sparkSession: SparkSession): DataFrame = {
     Loaders.loadChemblDrugList(chemblPath).orderBy(col("drug_name"))
+  }
+
+  private def addMedDraPreferredTerms(fdaDf: DataFrame)(
+      implicit context: ETLSessionContext): DataFrame = {
+    lazy val meddra: DataFrame = Loaders.loadMeddraPreferredTerms(
+      context.configuration.fda.fdaInputs.meddraPreferredTerms)(context.sparkSession)
+
+    logger.info("Adding meddra terms to fda data.")
+
+    fdaDf
+      .join(meddra, fdaDf("reaction_reactionmeddrapt") === meddra("ptName"), "left_outer")
+      .drop("ptName")
   }
 }

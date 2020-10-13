@@ -5,9 +5,9 @@ lazy val root = (project in file("."))
       scalaVersion := "2.12.10",
     )),
     name := "openfda",
-    version := "1.0.1",
+    version := "1.1.0",
     javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-    javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled", "-Dlogback.configurationFile=logback.xml"),
+    javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled"),
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
     parallelExecution in Test := false,
     fork := true,
@@ -32,6 +32,7 @@ lazy val root = (project in file("."))
 val sparkVer = "2.4.5"
 val scalaTestVer = "3.1.1"
 lazy val dependencies = Seq(
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "com.github.scopt" %% "scopt" % "4.0.0-RC1",
   "com.github.pureconfig" %% "pureconfig" % "0.12.3",

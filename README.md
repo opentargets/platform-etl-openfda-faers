@@ -85,6 +85,10 @@ Specify the number of permutations and the relevance percentile threshhold.
 
 Paths to the blacklisted_events, chembl data and fda database dump. 
 
+#### Meddra inputs
+
+Path to Meddra preferred terms file in asc format. 
+
 #### Outputs
 
 Specify format in which output should be saved. If no outputs are specified the 
@@ -268,6 +272,7 @@ The sampled dataset is saved to disk, and can be used as an input for subsequent
 | --- | --- | --- |
 | 1.0.0 | June 2020 | Initial release | 
 | 1.0.1 | September 2020 | Fixing output names; headers for CSV, keys for JSON | 
+| 1.1.0 | October 2020 | Adding meddra preferred terms to output. | 
 
 # Copyright
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute

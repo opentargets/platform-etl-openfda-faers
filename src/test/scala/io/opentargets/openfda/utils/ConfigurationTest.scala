@@ -16,14 +16,17 @@ class FdaConfigurationTest extends AnyFlatSpecLike with Matchers {
 
   "Fda config" should "not accept invalid output formats" in {
     a[IllegalArgumentException] should be thrownBy {
-      Fda(MonteCarlo(1, .04), FdaInputs(".txt", "json", "jsonl"), Seq("csv", "txt"), Sampling(""))
+      Fda(MonteCarlo(1, .04),
+          FdaInputs(".txt", "json", "jsonl", "asc"),
+          Seq("csv", "txt"),
+          Sampling(""))
     }
   }
 
   "Fda config" should "accept output formats" in {
     val fdaConfig =
       Fda(MonteCarlo(1, .04),
-          FdaInputs(".txt", "json", "jsonl"),
+          FdaInputs(".txt", "json", "jsonl", "asc"),
           Seq("csv", "json", "jsonl"),
           Sampling(""))
     assert(fdaConfig.outputs.length.equals(3))
@@ -54,21 +57,21 @@ class MonteCarloConfigTest extends TableDrivenPropertyChecks with Matchers with 
 class FdaInputsTest extends AnyFlatSpecLike with TableDrivenPropertyChecks with Matchers {
   private val fdaInputInvalidCombos =
     Table(
-      ("blist", "chembl", "fda"),
-      ("txt", "json", "json"),
-      ("txt", "json", "csv"),
-      ("txt", "json", "html"),
-      ("txt", "csv", "jsonl"),
-      ("txt", "txt", "jsonl"),
-      ("txt", "md", "jsonl"),
-      ("csv", "json", "jsonl"),
-      ("json", "json", "jsonl"),
-      ("html", "json", "jsonl")
+      ("blist", "chembl", "fda", "asc"),
+      ("txt", "json", "json", "asc"),
+      ("txt", "json", "csv", "asbc"),
+      ("txt", "json", "html", "asc"),
+      ("txt", "csv", "jsonl", "asc"),
+      ("txt", "txt", "jsonl", "asc"),
+      ("txt", "md", "jsonl", "asd"),
+      ("csv", "json", "jsonl", "asc"),
+      ("json", "json", "jsonl", "asc"),
+      ("html", "json", "jsonl", "asc")
     )
   "Fda config" should "not accept invalid output formats" in {
-    forAll(fdaInputInvalidCombos) { (blist: String, chembl: String, fda: String) =>
+    forAll(fdaInputInvalidCombos) { (blist: String, chembl: String, fda: String, meddra) =>
       a[IllegalArgumentException] should be thrownBy {
-        FdaInputs(blist, chembl, fda)
+        FdaInputs(blist, chembl, fda, meddra)
       }
     }
   }
