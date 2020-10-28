@@ -61,28 +61,40 @@ object Loaders extends LazyLogging {
       .orderBy(col("reactions").asc)
   }
 
-  /*
-   * The MedDRA raw data comes in a $ separated value format. There are large number of null fields that we're not
-   * interested which we want to discard. This method cleans the data and returns a usable dataframe.
-   * @return DataFrame with columns: ptCode, ptName. Code is meddra identifier, ptName is reaction in Fda data.
-   */
   def loadMeddraPreferredTerms(path: String)(implicit ss: SparkSession): DataFrame = {
     logger.info(s"Loading Meddra preferred terms from $path")
-    val cols = Seq("meddraPtCode", "ptName").zipWithIndex
+    val cols = Seq("pt_code", "pt_name")
+    loadMeddraDf(path + "MedAscii/pt.asc", cols)
+  }
+
+  def loadMeddraLowLevelTerms(path: String)(implicit sparkSession: SparkSession): DataFrame = {
+    logger.info(s"Loading Meddra low level terms from $path")
+    val lltCols = Seq("llt_code", "llt_name")
+    loadMeddraDf(path + "MedAscii/llt.asc", lltCols)
+  }
+
+  /**
+    * The MedDRA raw data comes in a $ separated value format. There are large number of null fields that we're not
+    * interested which we want to discard. This method cleans the data and returns a usable dataframe.
+    *
+    * The fields available have to be identified using the document `dist_file_format_<verions>_English.pdf` in the
+    * Meddra release.
+    * @param path to file to load (these meddra provided files are in .asc format)
+    * @param columns to map from meddra data.
+    * @return DataFrame with columns as specified in `columns`.
+    */
+  private def loadMeddraDf(path: String, columns: Seq[String])(
+      implicit ss: SparkSession): DataFrame = {
+
     val meddraRaw = ss.read.csv(path)
     val meddra = meddraRaw
       .withColumn("_c0", regexp_replace(col("_c0"), "\\$+", ","))
       .withColumn("_c0", regexp_replace(col("_c0"), "\\$$", ""))
       .withColumn("_c0", split(col("_c0"), ","))
-      .select(cols.map(i => col("_c0").getItem(i._2).as(s"${i._1}")): _*)
-      .withColumn("ptName", lower(col("ptName")))
-    logger.debug(s"""
-                    |Meddra data: 
-                    |\tCount: ${meddra.count}
-                    |\tColumns: ${meddra.columns.mkString("Array(", ", ", ")")}
-                    |""".stripMargin)
-    meddra
+      .select(columns.zipWithIndex.map(i => col("_c0").getItem(i._2).as(s"${i._1}")): _*)
+
+    val colsToLower = meddra.columns.filter(_.contains("name"))
+    colsToLower.foldLeft(meddra)((df, c) => df.withColumn(c, lower(col(c))))
 
   }
-
 }

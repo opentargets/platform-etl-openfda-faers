@@ -87,7 +87,7 @@ Paths to the blacklisted_events, chembl data and fda database dump.
 
 #### Meddra inputs
 
-Path to Meddra preferred terms file in asc format. 
+Path to Meddra data release. 
 
 #### Outputs
 

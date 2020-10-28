@@ -159,13 +159,18 @@ object OpenFdaEtl extends LazyLogging {
 
   private def addMedDraPreferredTerms(fdaDf: DataFrame)(
       implicit context: ETLSessionContext): DataFrame = {
-    lazy val meddra: DataFrame = Loaders.loadMeddraPreferredTerms(
-      context.configuration.fda.fdaInputs.meddraPreferredTerms)(context.sparkSession)
+    lazy val meddraPt: DataFrame = Loaders.loadMeddraPreferredTerms(
+      context.configuration.fda.fdaInputs.meddraRelease)(context.sparkSession)
+    lazy val meddraLlt: DataFrame = Loaders.loadMeddraLowLevelTerms(
+      context.configuration.fda.fdaInputs.meddraRelease)(context.sparkSession)
 
     logger.info("Adding meddra terms to fda data.")
-
     fdaDf
-      .join(meddra, fdaDf("reaction_reactionmeddrapt") === meddra("ptName"), "left_outer")
-      .drop("ptName")
+      .join(meddraPt.union(meddraLlt),
+            fdaDf("reaction_reactionmeddrapt") === meddraPt("pt_name"),
+            "left_outer")
+      .drop("pt_name")
+      .dropDuplicates("chembl_id", "pt_code", "reaction_reactionmeddrapt")
+      .withColumnRenamed("pt_code", "meddraCode")
   }
 }
