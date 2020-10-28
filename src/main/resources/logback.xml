@@ -7,6 +7,6 @@
 <root level="WARN">
 <appender-ref ref="STDOUT" />
 </root>
-<logger name="io.opentargets" level="INFO" />
+<logger name="io.opentargets.openfda" level="INFO" />
 <logger name="org.apache.spark" level="WARN" />
 </configuration>

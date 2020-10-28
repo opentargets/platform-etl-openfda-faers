@@ -44,7 +44,8 @@ object MonteCarloSampling {
       "reaction_reactionmeddrapt as event",
       "A as count",
       "llr",
-      "critVal_drug as critval"
+      "critVal_drug as critval",
+      "meddraCode"
     )
 
     val filteredDF = inputDf

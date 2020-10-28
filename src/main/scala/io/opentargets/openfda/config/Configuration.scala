@@ -11,12 +11,11 @@ case class FdaInputs(
     blacklist: String,
     chemblData: String,
     fdaData: String,
-    meddraPreferredTerms: String
+    meddraRelease: String
 ) {
   require(blacklist.endsWith("txt"), "Blacklist is required in txt extension")
   require(chemblData.endsWith("json"), "ChEMBL data is required in json format")
   require(fdaData.endsWith("jsonl"), "FDA data is required in jsonl format")
-  require(meddraPreferredTerms.endsWith("asc"), "MedDra data should end in 'asc'")
 }
 case class Sampling(output: String, size: Double = 0.1, enabled: Boolean = false) {
   require(size > 0)
