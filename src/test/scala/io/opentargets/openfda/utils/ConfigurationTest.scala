@@ -17,7 +17,7 @@ class FdaConfigurationTest extends AnyFlatSpecLike with Matchers {
   "Fda config" should "not accept invalid output formats" in {
     a[IllegalArgumentException] should be thrownBy {
       Fda(MonteCarlo(1, .04),
-          FdaInputs(".txt", "json", "jsonl", "asc"),
+          FdaInputs(".txt", "json", "jsonl", Option("asc")),
           Seq("csv", "txt"),
           Sampling(""))
     }
@@ -26,7 +26,7 @@ class FdaConfigurationTest extends AnyFlatSpecLike with Matchers {
   "Fda config" should "accept output formats" in {
     val fdaConfig =
       Fda(MonteCarlo(1, .04),
-          FdaInputs(".txt", "json", "jsonl", "asc"),
+          FdaInputs(".txt", "json", "jsonl", None),
           Seq("csv", "json", "jsonl"),
           Sampling(""))
     assert(fdaConfig.outputs.length.equals(3))
@@ -57,16 +57,16 @@ class MonteCarloConfigTest extends TableDrivenPropertyChecks with Matchers with 
 class FdaInputsTest extends AnyFlatSpecLike with TableDrivenPropertyChecks with Matchers {
   private val fdaInputInvalidCombos =
     Table(
-      ("blist", "chembl", "fda", "asc"),
-      ("txt", "json", "json", "asc"),
-      ("txt", "json", "csv", "asbc"),
-      ("txt", "json", "html", "asc"),
-      ("txt", "csv", "jsonl", "asc"),
-      ("txt", "txt", "jsonl", "asc"),
-      ("txt", "md", "jsonl", "asd"),
-      ("csv", "json", "jsonl", "asc"),
-      ("json", "json", "jsonl", "asc"),
-      ("html", "json", "jsonl", "asc")
+      ("blist", "chembl", "fda", "meddra"),
+      ("txt", "json", "json", Option("asc")),
+      ("txt", "json", "csv", Option("asbc")),
+      ("txt", "json", "html", Option("asc")),
+      ("txt", "csv", "jsonl", Option("asc")),
+      ("txt", "txt", "jsonl", Option("asc")),
+      ("txt", "md", "jsonl", Option("asd")),
+      ("csv", "json", "jsonl", Option("asc")),
+      ("json", "json", "jsonl", Option("asc")),
+      ("html", "json", "jsonl", Option("asc"))
     )
   "Fda config" should "not accept invalid output formats" in {
     forAll(fdaInputInvalidCombos) { (blist: String, chembl: String, fda: String, meddra) =>

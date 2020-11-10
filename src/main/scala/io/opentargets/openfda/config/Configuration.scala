@@ -11,7 +11,7 @@ case class FdaInputs(
     blacklist: String,
     chemblData: String,
     fdaData: String,
-    meddraRelease: String
+    meddraRelease: Option[String]
 ) {
   require(blacklist.endsWith("txt"), "Blacklist is required in txt extension")
   require(chemblData.endsWith("json"), "ChEMBL data is required in json format")

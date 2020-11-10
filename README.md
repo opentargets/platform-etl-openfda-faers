@@ -85,9 +85,9 @@ Specify the number of permutations and the relevance percentile threshhold.
 
 Paths to the blacklisted_events, chembl data and fda database dump. 
 
-#### Meddra inputs
+#### Meddra inputs (Optional)
 
-Path to Meddra data release. 
+Path to Meddra data release if available. Remove key from configuration file if data is not available.  
 
 #### Outputs
 
@@ -201,7 +201,7 @@ The fat jar can be executed on a local installation of Spark using `spark-submit
 
 The following sections outline how to obtain the necessary input files for the `platformDataProcessFDA.sc ` script.
 
-### Generate the indices dump from ES7
+#### Generate the indices dump from ES7
 
 You will need to either connect to a machine containing the ES or forward the ssh port from it
 ```sh
@@ -238,7 +238,14 @@ exit 0
 
 #### Blacklist
 
-The blacklist is a manually curated txt file to exclude events that are uninformative for our purposes. This is passed as a parameter to the `platformDataProcessFDA.sc` script. 
+The blacklist is a manually curated txt file to exclude events that are uninformative for our purposes. This is passed 
+as a parameter to the `platformDataProcessFDA.sc` script. 
+
+#### Meddra
+
+This pipeline uses an _optional_ subset of data from the [Medical Dictionary for Regulatory Activities](https://www.meddra.org) to link the adverse event terms used by the FDA back to their standardised names. 
+
+This data is included in the pipeline output provided by Open Targets, but if you are running the pipeline locally you need to download the most recent Meddra release which is subject to licensing restrictions. 
 
 ### Outputs
 
@@ -273,6 +280,8 @@ The sampled dataset is saved to disk, and can be used as an input for subsequent
 | 1.0.0 | June 2020 | Initial release | 
 | 1.0.1 | September 2020 | Fixing output names; headers for CSV, keys for JSON | 
 | 1.1.0 | October 2020 | Adding meddra preferred terms to output. | 
+| 1.1.1 | November 2020 | Making Meddra term inclusion optional. | 
+
 
 # Copyright
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
