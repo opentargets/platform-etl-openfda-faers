@@ -37,14 +37,21 @@ object OpenFdaEtl extends LazyLogging {
 
     val results = prepareForMonteCarlo(groupedByIds)
 
-    val resultsWithMeddra =
-      addMedDraPreferredTerms(results).persist(StorageLevel.MEMORY_AND_DISK_SER)
+    val resultsWithOptionalMeddra =
+      etLSessionContext.configuration.fda.fdaInputs.meddraRelease match {
+        case Some(value) =>
+          addMedDraPreferredTerms(results, value).persist(StorageLevel.MEMORY_AND_DISK_SER)
+        case None =>
+          results
+            .withColumn("meddraCode", typedLit[String](""))
+            .persist(StorageLevel.MEMORY_AND_DISK_SER)
+      }
 
     if (etLSessionContext.configuration.fda.sampling.enabled) {
       logger.info("Generating stratified sample")
-      StratifiedSampling(groupedByIds, resultsWithMeddra)
+      StratifiedSampling(groupedByIds, resultsWithOptionalMeddra)
     }
-    resultsWithMeddra
+    resultsWithOptionalMeddra
   }
 
   private def filterBlacklist(blacklistPath: String, df: DataFrame)(
@@ -157,12 +164,12 @@ object OpenFdaEtl extends LazyLogging {
     Loaders.loadChemblDrugList(chemblPath).orderBy(col("drug_name"))
   }
 
-  private def addMedDraPreferredTerms(fdaDf: DataFrame)(
+  private def addMedDraPreferredTerms(fdaDf: DataFrame, meddraPath: String)(
       implicit context: ETLSessionContext): DataFrame = {
-    lazy val meddraPt: DataFrame = Loaders.loadMeddraPreferredTerms(
-      context.configuration.fda.fdaInputs.meddraRelease)(context.sparkSession)
-    lazy val meddraLlt: DataFrame = Loaders.loadMeddraLowLevelTerms(
-      context.configuration.fda.fdaInputs.meddraRelease)(context.sparkSession)
+    lazy val meddraPt: DataFrame =
+      Loaders.loadMeddraPreferredTerms(meddraPath)(context.sparkSession)
+    lazy val meddraLlt: DataFrame =
+      Loaders.loadMeddraLowLevelTerms(meddraPath)(context.sparkSession)
 
     logger.info("Adding meddra terms to fda data.")
     fdaDf
