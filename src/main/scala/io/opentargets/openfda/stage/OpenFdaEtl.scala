@@ -172,12 +172,19 @@ object OpenFdaEtl extends LazyLogging {
       Loaders.loadMeddraLowLevelTerms(meddraPath)(context.sparkSession)
 
     logger.info("Adding meddra terms to fda data.")
-    fdaDf
-      .join(meddraPt.union(meddraLlt),
-            fdaDf("reaction_reactionmeddrapt") === meddraPt("pt_name"),
-            "left_outer")
-      .drop("pt_name")
-      .dropDuplicates("chembl_id", "pt_code", "reaction_reactionmeddrapt")
-      .withColumnRenamed("pt_code", "meddraCode")
+    // add preferred terms
+    val fdaPt = fdaDf
+      .join(meddraPt, fdaDf("reaction_reactionmeddrapt") === meddraPt("pt_name"), "left_outer")
+
+    // add low-level terms
+    val fdaPtLlt =
+      fdaPt.join(meddraLlt, fdaPt("reaction_reactionmeddrapt") === meddraLlt("llt_name"))
+
+    // take best
+    fdaPtLlt
+      .withColumn("meddraCode", coalesce(col("pt_code"), col("llt_code")))
+      .drop("pt_name", "llt_name", "pt_code", "llt_code")
+      .dropDuplicates(Seq("chembl_id", "reaction_reactionmeddrapt"))
+
   }
 }
