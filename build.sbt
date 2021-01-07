@@ -17,12 +17,10 @@ lazy val root = (project in file("."))
     mainClass in assembly := Some(s"${organization.value}.${name.value}.Main"),
     assemblyJarName in assembly := s"io-opentargets-etl-backend-assembly-${name.value}-${version.value}.jar",
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = true),
+    // Use 'provided' dependencies when running locally (see https://github.com/sbt/sbt-assembly#-provided-configuration)
+    run in Compile := Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)).evaluated,
     test in assembly := {},
     assemblyMergeStrategy in assembly := {
-      case PathList("META-INF", "services", "org.apache.hadoop.fs.FileSystem") =>
-        MergeStrategy.filterDistinctLines
-      case PathList("META-INF", "services", "org.apache.spark.sql.sources.DataSourceRegister") =>
-        MergeStrategy.concat
       case PathList("META-INF", xs @ _*) => MergeStrategy.discard
       case _                             => MergeStrategy.first
     }
@@ -36,11 +34,10 @@ lazy val dependencies = Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "com.github.scopt" %% "scopt" % "4.0.0-RC1",
   "com.github.pureconfig" %% "pureconfig" % "0.12.3",
-  "org.apache.spark" %% "spark-core" % sparkVer,
-  "org.apache.spark" %% "spark-sql" % sparkVer,
+  "org.apache.spark" %% "spark-core" % sparkVer % "provided",
+  "org.apache.spark" %% "spark-sql" % sparkVer % "provided",
   // ML library includes the org.scalanlp (Breeze) libraries. Use this library
   // to prevent compile/run-time dependency clashes.
-  "org.apache.spark" %% "spark-mllib" % sparkVer,
-  "org.scalactic" %% "scalactic" % scalaTestVer,
+  "org.apache.spark" %% "spark-mllib" % sparkVer % "provided",
   "org.scalatest" %% "scalatest" % scalaTestVer % "test"
 )

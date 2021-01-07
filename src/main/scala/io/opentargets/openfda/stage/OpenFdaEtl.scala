@@ -178,7 +178,9 @@ object OpenFdaEtl extends LazyLogging {
 
     // add low-level terms
     val fdaPtLlt =
-      fdaPt.join(meddraLlt, fdaPt("reaction_reactionmeddrapt") === meddraLlt("llt_name"))
+      fdaPt.join(meddraLlt,
+                 fdaPt("reaction_reactionmeddrapt") === meddraLlt("llt_name"),
+                 "left_outer")
 
     // take best
     fdaPtLlt
