@@ -85,6 +85,8 @@ Specify the number of permutations and the relevance percentile threshhold.
 
 Paths to the blacklisted_events, chembl data and fda database dump. 
 
+The _chembl data_ refers to the `drug` output of the `platform-backend-etl` pipeline's drug step. 
+
 #### Meddra inputs (Optional)
 
 Path to Meddra data release if available. Remove key from configuration file if data is not available.  
