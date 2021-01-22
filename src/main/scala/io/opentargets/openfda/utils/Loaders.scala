@@ -14,11 +14,11 @@ object Loaders extends LazyLogging {
       .json(path)
       .selectExpr("id as chembl_id",
                   "synonyms as synonyms",
-                  "pref_name pref_name",
-                  "trade_names as trade_names")
-      .withColumn("drug_names",
-                  array_distinct(
-                    flatten(array(col("trade_names"), array(col("pref_name")), col("synonyms")))))
+                  "name as pref_name",
+                  "tradeNames as trade_names")
+      .withColumn(
+        "drug_names",
+        array_distinct(flatten(array(col("tradeNames"), array(col("name")), col("synonyms")))))
       .withColumn("_drug_name", explode(col("drug_names")))
       .withColumn("drug_name", lower(col("_drug_name")))
       .select("chembl_id", "drug_name")
