@@ -23,7 +23,7 @@ class OpenFdaEtlTest
 
       // when
       val drugList = OpenFdaEtl invokePrivate generateDrugList(
-        this.getClass.getResource("/drug_data500.json").getPath,
+        this.getClass.getResource("/drug_test.json").getPath,
         sparkSession)
       // then
       val cols = drugList.columns
