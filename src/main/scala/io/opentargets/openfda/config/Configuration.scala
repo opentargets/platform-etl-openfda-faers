@@ -28,7 +28,7 @@ case class Fda(montecarlo: MonteCarlo,
                fdaInputs: FdaInputs,
                outputs: Seq[String],
                sampling: Sampling) {
-  private def validOutput(str: String): Boolean = List("csv", "json", "jsonl").contains(str)
+  private def validOutput(str: String): Boolean = List("csv", "json", "jsonl","parquet").contains(str)
   require(outputs.forall(validOutput))
 }
 object Configuration extends LazyLogging {
