@@ -13,7 +13,7 @@ object ETL extends LazyLogging {
     implicit val sc: SparkSession = context.sparkSession
     step match {
       case "fda" =>
-        logger.info("run step fda pipeline...")
+        logger.info("Run step fda pipeline...")
         val fdaConfig = context.configuration.fda
         logger.info("Aggregating FDA data...")
         val openFdaDataAggByChembl: DataFrame =
@@ -61,11 +61,11 @@ object ETL extends LazyLogging {
     val unknownSteps = etlSteps.toSet diff etlContext.configuration.common.defaultSteps.toSet
     val knownSteps = etlSteps.toSet intersect etlContext.configuration.common.defaultSteps.toSet
 
-    logger.info(s"valid steps to execute: ${knownSteps.toString}")
-    logger.warn(s"invalid steps to skip: ${unknownSteps.toString}")
+    logger.info(s"Valid steps to execute: ${knownSteps.toString}")
+    if (unknownSteps.nonEmpty) logger.warn(s"Invalid steps to skip: ${unknownSteps.toString}")
 
     knownSteps.foreach { step =>
-      logger.debug(s"step to run: '$step'")
+      logger.debug(s"Step to run: '$step'")
       ETL.applySingleStep(step)
     }
 

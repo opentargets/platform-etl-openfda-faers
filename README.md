@@ -35,19 +35,19 @@ This project should be run as a Spark job to generate aggregate outputs of adver
 Sample CSV output:
 
 ```
-chembl_id,event,count,llr,critval
-CHEMBL1231,cardiac output decreased,1,8.392140045623442,4.4247991585588675
-CHEMBL1231,cardiovascular insufficiency,1,7.699049533524681,4.4247991585588675
-CHEMBL888,acute kidney injury,9,6.599656934149834,6.04901361282136
-CHEMBL888,adenocarcinoma pancreas,2,6.557801342905918,6.04901361282136
-CHEMBL888,anaemia,10,8.200182769578191,6.04901361282136
+chembl_id,event,meddraCode,count,llr,critval
+CHEMBL1231,cardiac output decreased,123456,1,8.392140045623442,4.4247991585588675
+CHEMBL1231,cardiovascular insufficiency,123457,1,7.699049533524681,4.4247991585588675
+CHEMBL888,acute kidney injury,123458,9,6.599656934149834,6.04901361282136
+CHEMBL888,adenocarcinoma pancreas,123459,2,6.557801342905918,6.04901361282136
+CHEMBL888,anaemia,123460,10,8.200182769578191,6.04901361282136
 ```
 
 Sample JSON output:
 
 ```
-{"chembl_id":"CHEMBL1231","event":"cardiac output decreased","count":1,"llr":8.392140045623442,"critval":4.4247991585588675}
-{"chembl_id":"CHEMBL1231","event":"cardiovascular insufficiency","count":1,"llr":7.699049533524681,"critval":4.4247991585588675}
+{"chembl_id":"CHEMBL1231","event":"cardiac output decreased","meddraCode": ..., "count":1,"llr":8.392140045623442,"critval":4.4247991585588675}
+{"chembl_id":"CHEMBL1231","event":"cardiovascular insufficiency","meddraCode": ..., "count":1,"llr":7.699049533524681,"critval":4.4247991585588675}
 ```
 
 Notice that the JSON output is actually JSONL. Each line is a single result object. 
@@ -63,6 +63,7 @@ Notice that the JSON output is actually JSONL. Each line is a single result obje
 6. Text file of [blacklisted events](#blacklist)
 
 ### Create a fat JAR
+
 Simply run the following command:
 
 ```bash
@@ -89,7 +90,8 @@ The _chembl data_ refers to the `drug` output of the `platform-backend-etl` pipe
 
 #### Meddra inputs (Optional)
 
-Path to Meddra data release if available. Remove key from configuration file if data is not available.  
+Path to Meddra data release if available. Remove key from configuration file if data is not available. As this is proprietary
+data it must be provided on an optional basis for users who do not have this dataset. 
 
 #### Outputs
 
@@ -97,6 +99,16 @@ Specify format in which output should be saved. If no outputs are specified the
 results will not be saved. 
 
 Output can be either "csv" or "json".
+
+The pipeline will output the following directory structure:
+
+```
+output dir:
+   /agg_by_chembl/ 
+   /agg_critval_drug/
+```
+
+`agg_critval_drug` is used in the Open Targets front end.
 
 ### Running
 
@@ -198,23 +210,14 @@ The fat jar can be executed on a local installation of Spark using `spark-submit
 ```
 
 
+### Obtaining data inputs 
 
-### Obtaining data inputs
+#### Chembl drug data 
 
-The following sections outline how to obtain the necessary input files for the `platformDataProcessFDA.sc ` script.
+This are the files generated from the `platform-etl-backend` drug step. For a specific release they will usually be
+found in `gs://ot-snapshots/etl/outputs/<release>/drug/drugs/`
 
-#### Generate the indices dump from ES7
-
-You will need to either connect to a machine containing the ES or forward the ssh port from it
-```sh
-elasticdump --input=http://localhost:9200/<indexyouneed> \
-    --output=<indexyouneed>.json \
-    --type=data  \
-    --limit 10000 \
-    --sourceOnly
-```
-
-#### Produce the raw json from scratch
+#### Produce the raw FDA json from scratch
 
 In the case you need to obtain the FDA FAERS data these bash commands can be used to produce it
 
@@ -240,14 +243,16 @@ exit 0
 
 #### Blacklist
 
-The blacklist is a manually curated txt file to exclude events that are uninformative for our purposes. This is passed 
-as a parameter to the `platformDataProcessFDA.sc` script. 
+The blacklist is a manually curated txt file to exclude events that are uninformative for our purposes. The canonical file
+can be found in the `resources` directory.
 
 #### Meddra
 
-This pipeline uses an _optional_ subset of data from the [Medical Dictionary for Regulatory Activities](https://www.meddra.org) to link the adverse event terms used by the FDA back to their standardised names. 
+This pipeline uses an _optional_ subset of data from the [Medical Dictionary for Regulatory Activities](https://www.meddra.org) 
+to link the adverse event terms used by the FDA back to their standardised names. 
 
-This data is included in the pipeline output provided by Open Targets, but if you are running the pipeline locally you need to download the most recent Meddra release which is subject to licensing restrictions. 
+This data is included in the pipeline output provided by Open Targets, but if you are running the pipeline locally you 
+need to download the most recent Meddra release which is subject to licensing restrictions. 
 
 ### Outputs
 
@@ -275,6 +280,28 @@ not reproducible. Sampling is provided for basic validation and testing.
 
 The sampled dataset is saved to disk, and can be used as an input for subsequent jobs.  
 
+# Creating a new release
+
+1. Add tag to master so we can recreate the jar
+```
+git tag -a <release> -m "Release <release>"
+git push origin <release>
+```
+Where release is something like 20.11.0 (year, month, iteration). Hopefully we don't need the iteration. 
+
+2. Create jar and push to cloud storage
+```
+sbt assembly
+
+gsutil cp target/scala-2.12/<jar> gs://open-targets-data-releases/<release>/openfda-faers/<jar>
+```
+3. Generate input files and push to cloud
+4. Create updated configuration file and push to cloud
+  - Save file in same place as jar so it can be re-run if necessary.
+5. Run ETL step
+  - Update `run-openfda-dataproc.sh` with necessary variables (location of jar, config, etc)
+6. Create Elasticseach index (script in `platform-backend-etl` repository)
+
 # Versioning
 
 | Version | Date | Notes |
@@ -283,7 +310,7 @@ The sampled dataset is saved to disk, and can be used as an input for subsequent
 | 1.0.1 | September 2020 | Fixing output names; headers for CSV, keys for JSON | 
 | 1.1.0 | October 2020 | Adding meddra preferred terms to output. | 
 | 1.1.1 | November 2020 | Making Meddra term inclusion optional. | 
-
+| 1.1.2 | Feb 2021 | Removing duplicates. | 
 
 # Copyright
 Copyright 2014-2018 Biogen, Celgene Corporation, EMBL - European Bioinformatics Institute, GlaxoSmithKline, Takeda Pharmaceutical Company and Wellcome Sanger Institute
