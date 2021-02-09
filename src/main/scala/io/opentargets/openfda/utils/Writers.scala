@@ -24,14 +24,30 @@ object Writers extends LazyLogging {
         logger.info("Writing monte carlo results as json output...")
         results.write
           .json(s"$outputPath/agg_critval_drug/")
+      case "parquet" =>
+        logger.info("Writing monte carlo results as parquet output...")
+        results.write
+          .format("parquet")
+          .save(s"$outputPath/agg_critval_drug-parquet/")
 
       case err: String => logger.error(s"Unrecognised output format $err")
     }
 
   }
 
-  def writeFdaResults(results: DataFrame, outputPath: String): Unit = {
-    logger.info("Writing results of fda data transformation aggregated by Chembl...")
-    results.write.json(s"$outputPath/agg_by_chembl/")
+  def writeFdaResults(results: DataFrame, outputPath: String, extension: String): Unit = {
+    logger.info("Writing results of fda data transformation aggregated by Chembl.")
+    extension match {
+      case "json" =>
+        logger.info("format json")
+        results.write.
+           format(extension).save(s"$outputPath/agg_by_chembl/")
+      case "parquet" =>
+        logger.info("format paquet")
+        results.write.
+          format(extension).save(s"$outputPath/agg_by_chembl_$extension/")
+
+      case err: String => logger.error(s"Unrecognised output format $err")
+    }
   }
 }

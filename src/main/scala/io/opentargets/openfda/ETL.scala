@@ -29,7 +29,11 @@ object ETL extends LazyLogging {
         // write results if necessary
         logger.info("Writing results of FDA pipeline...")
 
-        Writers.writeFdaResults(openFdaDataAggByChembl, context.configuration.common.output)
+        if (fdaConfig.outputs.nonEmpty) {
+          fdaConfig.outputs.foreach { extension =>
+            Writers.writeFdaResults(openFdaDataAggByChembl, context.configuration.common.output, extension)
+          }
+        }
 
         if (fdaConfig.outputs.nonEmpty) {
           fdaConfig.outputs.foreach { extension =>

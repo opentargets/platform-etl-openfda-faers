@@ -27,7 +27,7 @@ class FdaConfigurationTest extends AnyFlatSpecLike with Matchers {
     val fdaConfig =
       Fda(MonteCarlo(1, .04),
           FdaInputs(".txt", "json", "jsonl", None),
-          Seq("csv", "json", "jsonl"),
+          Seq("csv", "json", "parquet"),
           Sampling(""))
     assert(fdaConfig.outputs.length.equals(3))
   }
