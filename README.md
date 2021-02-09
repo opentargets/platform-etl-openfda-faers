@@ -5,8 +5,8 @@ OpenTargets ETL pipeline to process OpenFDA FAERS DB.
 The openFDA drug adverse event API returns data that has been collected from the FDA Adverse Event Reporting System (FAERS), 
 a database that contains information on adverse event and medication error reports submitted to FDA.
 
-The pipeline supports two output formats (CSV and JSON) which can be specified in the configuration file. For Open Targets,
-both formats are used:
+The pipeline supports three output formats (Parquet, CSV and JSON) which can be specified in the configuration file. 
+For Open Targets, both formats are used:
 
 - CSV: adverse_event in the current pipeline
 - JSON: openfda index in the ETL pipeline
@@ -104,11 +104,14 @@ The pipeline will output the following directory structure:
 
 ```
 output dir:
-   /agg_by_chembl/ 
-   /agg_critval_drug/
+    agg_by_chembl
+    agg_critical_drug
+    agg_by_chembl_parquet
+    agg_critical_drug_parquet
+    agg_critical_drug_csv
 ```
 
-`agg_critval_drug` is used in the Open Targets front end.
+`agg_critval_drug` is used in the Open Targets front end via Elasticsearch.
 
 ### Running
 
@@ -301,6 +304,7 @@ gsutil cp target/scala-2.12/<jar> gs://open-targets-data-releases/<release>/open
 5. Run ETL step
   - Update `run-openfda-dataproc.sh` with necessary variables (location of jar, config, etc)
 6. Create Elasticseach index (script in `platform-backend-etl` repository)
+  - The relevant output file is `agg_critval_drug`
 
 # Versioning
 
