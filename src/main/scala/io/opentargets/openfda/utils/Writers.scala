@@ -18,17 +18,17 @@ object Writers extends LazyLogging {
           .write
           .option("compression", "gzip")
           .option("header", "true")
-          .csv(s"$outputPath/agg_critval_drug_csv/")
+          .csv(s"$outputPath")
 
       case "json" =>
         logger.info("Writing monte carlo results as json output...")
         results.write
-          .json(s"$outputPath/agg_critval_drug/")
+          .json(s"$outputPath")
       case "parquet" =>
         logger.info("Writing monte carlo results as parquet output...")
         results.write
           .format("parquet")
-          .save(s"$outputPath/agg_critval_drug-parquet/")
+          .save(s"$outputPath")
 
       case err: String => logger.error(s"Unrecognised output format $err")
     }
@@ -41,11 +41,11 @@ object Writers extends LazyLogging {
       case "json" =>
         logger.info("format json")
         results.write.
-           format(extension).save(s"$outputPath/agg_by_chembl/")
+           format(extension).save(s"${outputPath}Unfiltered")
       case "parquet" =>
         logger.info("format paquet")
         results.write.
-          format(extension).save(s"$outputPath/agg_by_chembl_$extension/")
+          format(extension).save(s"${outputPath}Unfiltered")
 
       case err: String => logger.error(s"Unrecognised output format $err")
     }
