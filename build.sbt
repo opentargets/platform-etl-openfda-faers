@@ -27,7 +27,8 @@ lazy val root = (project in file("."))
 
   )
 
-val sparkVer = "2.4.5"
+//val sparkVer = "2.4.5"
+val sparkVer = "3.1.1"
 val scalaTestVer = "3.1.1"
 lazy val dependencies = Seq(
   "ch.qos.logback" % "logback-classic" % "1.2.3",
